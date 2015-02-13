@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Project ToolsVersion="4.0"
+         DefaultTargets="Build"
+         xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <OutDir Condition=" '$(OutDir)'=='' ">$(MSBuildThisFileDirectory)bin\</OutDir>
+    <Configuration Condition=" '$(Configuration)'=='' ">Debug</Configuration>
+    <SourceDir Condition=" '$(SourceDir)'=='' ">$(MSBuildThisFileDirectory)src\</SourceDir>
+    <ToolsDir Condition=" '$(ToolsDir)'=='' ">$(MSBuildThisFileDirectory)tools\</ToolsDir>
+    <ClojureCompiler Condition=" '$(ClojureCompiler)'==''">$(MSBuildThisFileDirectory)tools\Clojure.Compile.exe</ClojureCompiler>
+    <PackagesDir Condition=" '$(PackagesDir)'=='' ">$(MSBuildThisFileDirectory)packages</PackagesDir>
+    <ClojurePackageDir Condition=" '$(ClojurePackageDir)'==''">$(PackagesDir)\Clojure.1.6.0.1\</ClojurePackageDir>
+    <TargetsDir Condition=" '$(TargetsDir)'=='' ">$(MSBuildThisFileDirectory)targets\</TargetsDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ClojureTools Include="$(ClojurePackageDir)tools\net40\*" />
+    <ClojureLibs Include="$(ClojurePackageDir)lib\net40\*" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <CampMainSources Include="$(SourceDir)\camp\main.clj" />
+  </ItemGroup>
+
+  <Target Name="RestorePackages">
+    <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
+
+    <!-- copy clojure compiler tools into tools directory - you can't run them directly from packages... -->
+    <Copy SourceFiles="@(ClojureTools)" DestinationFolder="$(ToolsDir)" />
+    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(ToolsDir)" />
+  </Target>
+
+  <Target Name="Clean">
+    <Delete Files="$(TargetsDir)**" />
+    <Delete Files="$(SourceDir)camp\main.clj.dll" />
+    <Delete Files="$(SourceDir)camp\main.clj.exe" />
+  </Target>
+
+  <Target Name="Build" DependsOnTargets="RestorePackages;CampMain">
+  </Target>
+
+  <Target Name="CampMain">
+    <!-- CLOJURE_COMPILE_PATH -->
+    <Exec Command="$(ClojureCompiler) %(CampMainSources.Filename)"
+	  Outputs="main.exe"
+	  WorkingDirectory="$(SourceDir)camp" />
+    <Move SourceFiles="$(SourceDir)camp\main.exe"
+          DestinationFiles="$(TargetsDir)camp.exe" />
+    <Delete Files="$(SourceDir)camp\main.clj.dll" />
+    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(TargetsDir)" />
+  </Target>
+
+</Project>
