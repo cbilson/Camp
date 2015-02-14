@@ -1,6 +1,7 @@
 * Features
 
-** TODO new command :v0_1_0:
+** WIP new command						     :v0_1_0:
+
    #+BEGIN_SRC shell
      camp new myapp
    #+END_SRC
@@ -12,24 +13,51 @@
      - includes lein-esque deps
    - add src/myapp/core.clj
 
-** BACKLOG deps command :v1_0_1_0:
+** BACKLOG deps command 					     :v1_0_1_0:
    - fetch deps from nuget
      - or maybe look at packet?
 
-** BACKLOG compile command :v_0_1_0:
+** BACKLOG compile command                                           :v_0_1_0:
    - fetch deps in not already there
    - construct a Clojure.Compiler command line
    - output goes in targets dir
 
-** BACKLOG repl :v_0_1_1:
+** BACKLOG repl                                                      :v_0_1_1:
    - just fire up a repl with the project loaded for now.
 
-** BACKLOG nrepl :v_0_1_2:
+** BACKLOG nrepl                                                     :v_0_1_2:
    - supposedly it "almost works"
 
-** BACKLOG assembly merging
+** BACKLOG templates                                                 :v_0_1_3:
+   - I like the way leiningen templates work. Something like that...
+
+** BACKLOG assembly merging                                          :v_0_1_4:
    - ILMerge has issues.
    - Maybe try Jeffery Richter idea
      - have a stub EXE with assemblies embedded as resources
      - there was some problem with that, though, too, AFAIR.
    
+
+* Ideas
+
+** Camping Metaphor
+
+*** Winnebago or One-Person Tent
+    - You can go crazy and :require all the things (Winnebago), or
+      travel light and keep it simple.
+
+*** Base Camp
+    - You can create one project, then take what you want for it and
+      go on up the mountain to the next project, establishing a new
+      camp.
+    - Mountaineering with a base camp and camp I, camp II, ...
+      - Vague...I am really thinking about being able to quickly
+        re-use assets (think: "I have bootstrap over there
+        already. Just use that!", or "On a plane. Can't restore
+        packages. Please re-use package I already downloaded over
+        there.", like maven.)
+    - Also like the George Carlin sketch about going to Honolulu with
+      a bunch of stuff, then taking less stuff for a couple of days to
+      Maui, then even less stuff somewhere else...
+
+*** Camping is just fun
