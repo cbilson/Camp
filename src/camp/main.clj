@@ -1,20 +1,7 @@
 (ns camp.main
+  (:require [camp.core :as core])
   (:gen-class))
 
 (defn -main [& args]
-  (println "
- .--.      .---.   ___ .-. .-.      .-..   
- /    \\    / .-, \\ (   )   '   \\    /    \\  
-|  .-. ;  (__) ; |  |  .-.  .-. ;  ' .-,  ; 
-|  |(___)   .'`  |  | |  | |  | |  | |  . | 
-|  |       / .'| |  | |  | |  | |  | |  | | 
-|  | ___  | /  | |  | |  | |  | |  | |  | | 
-|  '(   ) ; |  ; |  | |  | |  | |  | |  ' | 
-'  `-' |  ' `-'  |  | |  | |  | |  | `-'  ' 
- `.__,'   `.__.'_. (___)(___)(___) | \\__.'  
-                                   | |      
-                                  (___)     
-
--------------------------------------------
-A tool to get you started with ClojureCLR.
-"))
+  (let [{task :task :as options} (core/parse-args args)]
+    (task options)))
