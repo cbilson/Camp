@@ -1,13 +1,8 @@
 ;; -*- compilation-command: "msbuild /t:CampExe /verbosity:minimal"
 (ns camp.tasks.new
   (:require [clojure.clr.io :as io]
-            [clojure.pprint :refer [pprint with-pprint-dispatch code-dispatch]]
             [camp.core :refer [getenv]]
             [camp.io :as cio]))
-
-(defn pprint-form [form]
-  (with-pprint-dispatch code-dispatch
-    (pprint form)))
 
 (defn gitignore []
   (println "/targets")
@@ -20,10 +15,12 @@
   (println "/out"))
 
 (defn project-clj [name]
-  (pprint-form
-   `(defproject ~name "0.1.0-SNAPSHOT"
-      :depends [[Clojure "1.6.0.1"]]
-      :plugins [['not-supported-yet]])))
+  (println  "(defproject " name "\"0.1.0-SNAPSHOT\"")
+  (println  "  :description \"TODO: describe\"")
+  (println  "  :license {:name \"BSD\"")
+  (println  "            :url \"http://www.opensource.org/licenses/BSD-3-Clause\"")
+  (println  "            :distribution :repo}")
+  (println  "  :dependencies [[Clojure \"1.6.0.1\"]]})"))
 
 (defn write-template [fname template-fn & args]
   (with-open [writer (io/text-writer fname)]
