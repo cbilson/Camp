@@ -1,0 +1,29 @@
+* Features
+
+** TODO new command :v1:
+   #+BEGIN_SRC shell
+     camp new myapp
+   #+END_SRC
+
+   This should:
+   - create a new directory
+   - add a .gitignore
+   - add a project.clj
+     - includes lein-esque deps
+   - add src/myapp/core.clj
+
+** BACKLOG deps command :v1:
+   - fetch deps from nuget
+     - or maybe look at packet?
+
+** BACKLOG compile command :v1:
+   - fetch deps in not already there
+   - construct a Clojure.Compiler command line
+   - output goes in targets dir
+
+** BACKLOG assembly merging
+   - ILMerge has issues.
+   - Maybe try Jeffery Richter idea
+     - have a stub EXE with assemblies embedded as resources
+     - there was some problem with that, though, too, AFAIR.
+   

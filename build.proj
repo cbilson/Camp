@@ -19,10 +19,6 @@
     <ClojureLibs Include="$(ClojurePackageDir)lib\net40\*" />
   </ItemGroup>
   
-  <ItemGroup>
-    <CampMainSources Include="$(SourceDir)\camp\main.clj" />
-  </ItemGroup>
-
   <Target Name="RestorePackages">
     <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
 
@@ -31,24 +27,40 @@
     <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(ToolsDir)" />
   </Target>
 
-  <Target Name="Clean">
-    <Delete Files="$(TargetsDir)**" />
-    <Delete Files="$(SourceDir)camp\main.clj.dll" />
-    <Delete Files="$(SourceDir)camp\main.clj.exe" />
-  </Target>
+  <Target Name="Build" DependsOnTargets="RestorePackages;CampExe" />
 
-  <Target Name="Build" DependsOnTargets="RestorePackages;CampMain">
-  </Target>
+  <ItemGroup>
+    <!-- Clojure.Compile wants the source namespace names, not files -->
+    <ClojureSources Include="camp.main" />
+    <ClojureSources Include="camp.core" />
+    <ClojureSources Include="camp.tasks.new" />
+  </ItemGroup>
 
-  <Target Name="CampMain">
-    <!-- CLOJURE_COMPILE_PATH -->
-    <Exec Command="$(ClojureCompiler) %(CampMainSources.Filename)"
-	  Outputs="main.exe"
-	  WorkingDirectory="$(SourceDir)camp" />
-    <Move SourceFiles="$(SourceDir)camp\main.exe"
-          DestinationFiles="$(TargetsDir)camp.exe" />
-    <Delete Files="$(SourceDir)camp\main.clj.dll" />
+  <ItemGroup>
+    <ClojureCompilerOutput Include="$(SourceDir)**\*.dll;$(SourceDir)**\*.exe" />
+    <TargetBinaries Include="$(TargetsDir)**" />
+  </ItemGroup>
+
+  <Target Name="CampExe" DependsOnTargets="Compile">
     <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(TargetsDir)" />
+    <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" />
+  </Target>
+
+  <Target Name="Package" DependsOnTargets="CampExe">
+    <!-- for later, when I want to distribute this -->
+    <!-- rename camp.main.exe to something shorter -->
+    <Move SourceFiles="$(SourceDir)camp.main.exe"
+          DestinationFiles="$(TargetsDir)camp.exe" />
+  </Target>
+
+  <Target Name="Compile">
+    <Exec Command="$(ClojureCompiler) @(ClojureSources, ' ')"
+	  WorkingDirectory="$(SourceDir)" />
+  </Target>
+
+  <Target Name="Clean">
+    <Delete Files="@(TargetBinaries)" />
+    <Delete Files="@(ClojureCompilerOutput)" />
   </Target>
 
 </Project>

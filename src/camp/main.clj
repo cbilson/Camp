@@ -1,4 +1,4 @@
-(ns main
+(ns camp.main
   (:gen-class))
 
 (defn -main [& args]

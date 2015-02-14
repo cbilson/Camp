@@ -2,3 +2,5 @@
 /targets/
 /tools/Clojure*
 /tools/Microsoft*
+/src/**/*.dll
+/src/**/*.exe
