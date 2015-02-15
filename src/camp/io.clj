@@ -8,6 +8,16 @@
   ([name access-control]
    (Directory/CreateDirectory (str name) access-control)))
 
+(defn directory-exists?
+  "Check to see if a directory exists."
+  [name]
+  (Directory/Exists name))
+
+(defn file-exists?
+  "Check to see if a file exists."
+  [name]
+  (File/Exists name))
+
 (defn file
   "TODO: pull request to clojure-clr? Need approval from work, sign contributor
   agreement, ..., friction."

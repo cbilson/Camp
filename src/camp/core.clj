@@ -1,4 +1,7 @@
 (ns camp.core
+  (:require [clojure.edn :as edn]
+            [clojure.clr.io :as io]
+            [camp.io :as cio])
   (:import [System Environment]))
 
 (defn resolve-task
@@ -9,16 +12,15 @@
         sym (symbol ns task-name)]
     (when-not (find-ns ns-sym)
       (require ns-sym))
-
     (resolve sym)))
 
-(defn parse-args [[task & rest-args]]
-  (if (not task)
-    (do
-      {:task (resolve-task "help")})
-    (merge
-     {:task (resolve-task task)}
-     (apply hash-map (map read-string rest-args)))))
+(defn read-project
+  "Read  the project file."
+  []
+  (if (cio/file-exists? "project.clj")
+    (with-open [reader (io/text-reader "project.clj")]
+      (edn/read reader))
+    {}))
 
 (defn getenv
   "Get the value of an environment variable"

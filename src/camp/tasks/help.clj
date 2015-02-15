@@ -19,8 +19,7 @@ A tool to get you started with ClojureCLR.     (___)
 
 (defn help
   "Print out help about how to use camp."
-  [options]
-  (when-not (:no-banner options)
-    (banner))
+  [project & rest]
+  (banner)
   ;; TODO: Enumerate all the tasks
   (println "TODO: implement help"))

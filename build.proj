@@ -33,8 +33,9 @@
     <!-- Clojure.Compile wants the source namespace names, not files -->
     <ClojureSources Include="camp.main" />
     <ClojureSources Include="camp.core" />
-    <ClojureSources Include="camp.tasks.new" />
+    <ClojureSources Include="camp.tasks.compile" />
     <ClojureSources Include="camp.tasks.help" />
+    <ClojureSources Include="camp.tasks.new" />
   </ItemGroup>
 
   <ItemGroup>

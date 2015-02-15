@@ -37,6 +37,17 @@
      - have a stub EXE with assemblies embedded as resources
      - there was some problem with that, though, too, AFAIR.
    
+** BACKLOG resources                                                 :v_0_1_4:
+   Need a way to embed resources in assemblies.
+   - resource compiler
+   - lots of JVM projects depend on resources and I imagine CLR ones
+     will too.
+
+** BACKLOG plugins
+
+** BACKLOG compiling other languages
+
+** BACKLOG profiles
 
 * Ideas
 

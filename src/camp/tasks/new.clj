@@ -27,9 +27,12 @@
     (binding [*out* writer]
       (apply template-fn args))))
 
+#_(defn -dump-template [fname template-fn & args]
+  (apply template-fn args))
+
 (defn new
   "Create a new ClojureCLR project from a template."
-  [{:keys [name] :as project} & args]
+  [project name & rest]
   (cio/mkdir name)
   (write-template (cio/file (str name) "project.clj") project-clj name)
   (write-template (cio/file (str name) ".gitignore") gitignore))
