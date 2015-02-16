@@ -2,7 +2,9 @@
   (:require [clojure.edn :as edn]
             [clojure.clr.io :as io]
             [camp.io :as cio])
-  (:import [System Environment]))
+  (:import [System Environment]
+           [System.IO File]
+           [clojure.lang PushbackTextReader]))
 
 (defn resolve-task
   "Given the name of a task, find the function that implements it."
@@ -16,11 +18,12 @@
 
 (defn read-project
   "Read  the project file."
-  []
-  (if (cio/file-exists? "project.clj")
-    (with-open [reader (io/text-reader "project.clj")]
-      (edn/read reader))
-    {}))
+  ([] (read-project "project.clj"))
+  ([project-file-name]
+   (if (cio/file-exists? project-file-name)
+     (with-open [reader (PushbackTextReader. (File/OpenText project-file-name))]
+       (edn/read reader))
+     {})))
 
 (defn getenv
   "Get the value of an environment variable"

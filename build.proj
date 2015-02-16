@@ -18,13 +18,17 @@
     <ClojureTools Include="$(ClojurePackageDir)tools\net40\*" />
     <ClojureLibs Include="$(ClojurePackageDir)lib\net40\*" />
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Libs Include="$(PackagesDir)\Nuget.Core.2.8.3\lib\net40-Client\NuGet.Core.dll" />
+  </ItemGroup>
+
   <Target Name="RestorePackages">
     <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
 
     <!-- copy clojure compiler tools into tools directory - you can't run them directly from packages... -->
-    <Copy SourceFiles="@(ClojureTools)" DestinationFolder="$(ToolsDir)" />
-    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(ToolsDir)" />
+    <Copy SourceFiles="@(ClojureTools)" DestinationFolder="$(ToolsDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(ToolsDir)" SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="Build" DependsOnTargets="RestorePackages;CampExe" />
@@ -34,6 +38,7 @@
     <ClojureSources Include="camp.main" />
     <ClojureSources Include="camp.core" />
     <ClojureSources Include="camp.tasks.compile" />
+    <ClojureSources Include="camp.tasks.deps" />
     <ClojureSources Include="camp.tasks.help" />
     <ClojureSources Include="camp.tasks.new" />
   </ItemGroup>
@@ -44,7 +49,8 @@
   </ItemGroup>
 
   <Target Name="CampExe" DependsOnTargets="Compile">
-    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(TargetsDir)" />
+    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(TargetsDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(Libs)" DestinationFolder="$(TargetsDir)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" />
   </Target>
 
