@@ -1,5 +1,6 @@
 (ns camp.io
-  (:import [System.IO Path File Directory]))
+  (:import [System.IO Path File Directory]
+           [clojure.lang PushbackTextReader]))
 
 (defn mkdir
   "Create a directory."
@@ -23,3 +24,9 @@
   agreement, ..., friction."
   [& args]
   (Path/Combine (->> args (map str) to-array (into-array String))))
+
+(defn reader
+  "clojure.clr.io only has text-reader, which isn't a PushbackTextReader
+  for some reason."
+  [path]
+  (PushbackTextReader. (File/OpenText path)))

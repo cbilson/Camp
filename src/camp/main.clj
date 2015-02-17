@@ -1,6 +1,7 @@
 ;; -*- compile-command: "msbuild /t:CampExe /verbosity:minimal && targets\camp.main.exe new scratch-project"
 (ns camp.main
-  (:require [camp.core :as core])
+  (:require [camp.core :as core]
+            [camp.project :as proj])
   (:gen-class))
 
 (defn -main
@@ -12,7 +13,7 @@ and rest of arguments."
     (let [task (if-let [task-name (first args)]
                  (core/resolve-task task-name)
                  (core/resolve-task "help"))
-          project (core/read-project)]
+          project (proj/read-project)]
       (or (apply task project (rest args)) 0))
     (catch Exception e
       (println (str "Error: " (.ToString e)))

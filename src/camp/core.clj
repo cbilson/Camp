@@ -16,15 +16,6 @@
       (require ns-sym))
     (resolve sym)))
 
-(defn read-project
-  "Read  the project file."
-  ([] (read-project "project.clj"))
-  ([project-file-name]
-   (if (cio/file-exists? project-file-name)
-     (with-open [reader (PushbackTextReader. (File/OpenText project-file-name))]
-       (edn/read reader))
-     {})))
-
 (defn getenv
   "Get the value of an environment variable"
   ([name] (getenv name nil))
