@@ -1,18 +1,20 @@
-;; -*- compilation-command: "C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe /t:CampExe /verbosity:minimal"
-(assembly-load-with-partial-name "NuGet.Core")
+(assembly-load-from "..\\targets\\NuGet.Core.dll")
 
 (ns camp.tasks.deps
   (:import [NuGet PackageManager SemanticVersion PackageRepositoryFactory]))
 
+(defn- make-repository []
+  (.CreateRepository PackageRepositoryFactory/Default "https://nuget.org/api/v2"))
+
 (defn- make-package-manager []
-  (PackageManager. PackageRepositoryFactory/Default
-                   (make-array String)
-                   true))
+  (let [repo (make-repository)]
+    (PackageManager. (make-repository) "packages")))
 
 (defn- install-package [package-manager [id version]]
   (let [id (str id)
         version (SemanticVersion. version)]
-    (.AddPackageReference package-manager id version)))
+    (println "Installing" id version)
+    (.InstallPackage package-manager id version)))
 
 (defn deps
   "Fetch dependencies defined in the project file."
