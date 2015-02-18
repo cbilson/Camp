@@ -1,8 +1,14 @@
 (assembly-load-from "..\\targets\\NuGet.Core.dll")
 
 (ns camp.tasks.deps
+  "Functions for managing dependencies in the project."
   (:require [camp.io :as io])
-  (:import [NuGet LocalPackageRepository PackageHelper
+  (:import [System.Runtime.Versioning FrameworkName]
+           [NuGet
+            IFrameworkTargetable
+            IPackage
+            LocalPackageRepository
+            PackageExtensions PackageHelper
             PackageManager PackageRepositoryFactory
             PackageReference SemanticVersion
             VersionUtility]))
@@ -50,21 +56,48 @@
     (println "Installing" dep)
     (install! pm dep)))
 
-(defn- find-package [repo [id ver]]
-  (.FindPackage repo id (semver ver)))
+(defn- find-package [pm [id ver]]
+  (let [repo (.LocalRepository pm)]
+    (.FindPackage repo (str id) (semver ver))))
 
-#_(defn libs
-  "Gets all the library files in all dependency packages."
-  [{:keys [packages-dir target-framework dependencies] :as proj}]
-  (let [repo (local-repo proj)]
-    (->> dependencies
-         (map (partial find-package repo))
-         (remove nil?))))
+(defn- target-framework [package]
+  (.TargetFramework package))
+
+(defn- target-framework? [proj ^IFrameworkTargetable ft]
+  (some (partial = (framework proj)) (.SupportedFrameworks ft)))
+
+(defn- full-name [^IPackage pkg]
+  (str (.Id pkg) (.Version pkg)))
+
+(defn- compatible-files
+  ([proj selector]
+   (mapcat (partial compatible-files proj selector) (:dependencies proj)))
+  ([{packages-dir :packages-dir :as proj} selector dep]
+   (let [pm (package-mgr proj)
+         pkg (find-package pm dep)]
+     (->> pkg
+          selector
+          (filter (partial target-framework? proj))
+          (map (partial io/file packages-dir (full-name pkg)))))))
+
+(defn libs
+  "Get the libs from all the dependencies in the project."
+  ([proj]
+   (compatible-files proj #(PackageExtensions/GetLibFiles %))))
+
+(defn tools
+  "Get the tools from all the dependencies in the project."
+  ([proj]
+   (compatible-files proj #(PackageExtensions/GetToolFiles %))))
+
+(defn content
+  "Get the content from all the dependencies in the project."
+  ([proj]
+   (compatible-files proj #(PackageExtensions/GetContentFiles %))))
 
 (defn deps
   "Fetch dependencies defined in the project file."
   [{:keys [dependencies] :as proj} & _]
   (let [pm (package-mgr proj)]
     (doseq [dep dependencies]
-      (ensure-installed! proj pm dep)))
-  #_(println "Libs:" (pr-str (libs proj))))
+      (ensure-installed! proj pm dep))))
