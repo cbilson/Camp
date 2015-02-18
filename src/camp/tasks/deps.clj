@@ -2,57 +2,69 @@
 
 (ns camp.tasks.deps
   (:require [camp.io :as io])
-  (:import [NuGet PackageHelper
+  (:import [NuGet LocalPackageRepository PackageHelper
             PackageManager PackageRepositoryFactory
             PackageReference SemanticVersion
             VersionUtility]))
 
-(defn- make-repository [{repository :repository}]
-  (.CreateRepository PackageRepositoryFactory/Default repository))
+(defn local-repo [project]
+  (LocalPackageRepository. (:packages-dir project)))
 
-(defn- make-package-manager [project]
-  (let [remote-repository (make-repository project)]
-    (PackageManager. remote-repository "packages")))
+(defn remote-repo [project]
+  (.CreateRepository PackageRepositoryFactory/Default
+                     (:nuget-repository project)))
 
-;; TODO: Allow use of version constraints?
-(defn- dependency->PackageReference
-  [{target-framework :target-framework :as project} [id version]]
-  (let [semantic-version (SemanticVersion/Parse version)
-        framework-name (VersionUtility/ParseFrameworkName target-framework)]
-    (PackageReference.
-     (str id)
-     semantic-version
-     nil
-     framework-name
-     false
-     false)))
+(defn package-mgr [project]
+  (PackageManager. (remote-repo project) (:packages-dir project)))
 
-(defn- installed? [package-manager package-ref]
-  (let [local-repo (.LocalRepository package-manager)
-        paths (.GetPackageLookupPaths local-repo
-                                      (.Id package-ref)
-                                      (.Version package-ref))]
-    (println "paths: " (pr-str (seq paths)))
-    (not (nil? (some io/directory-exists? paths)))))
+(defn- semver [version]
+  (SemanticVersion/Parse version))
 
-(defn- install-package! [package-manager package-ref]
-  (let [source-repository (.SourceRepository package-manager)]
-    (.InstallPackage package-manager
-                     (.Id package-ref)
-                     (.Version package-ref)
-                     false
-                     false)))
+(defn framework [{target-framework :target-framework}]
+  (VersionUtility/ParseFrameworkName target-framework))
 
-(defn- ensure-package-installed! [project package-manager dependency]
-  (let [package-ref (dependency->PackageReference project dependency)]
-    (when (not (installed? package-manager package-ref))
-      (println "Installing" package-ref)
-      ;; TODO: Handle consent
-      (install-package! package-manager package-ref))))
+(defn- package-ref
+  "Convert a dependency in a project to a NuGet PackageReference."
+  [proj [id ver]]
+  (let [ver (semver ver)
+        fw (framework proj)]
+    (PackageReference. (str id) ver nil fw false false)))
+
+(defn- pkg-files [proj pm [id ver]]
+  (let [repo (.LocalRepository pm)]
+    (map (partial io/file (:packages-dir proj))
+         (.GetPackageLookupPaths repo (str id) (semver ver)))))
+
+(defn- installed?
+  "Check to see if a dependency is installed locally."
+  [proj pm dep]
+  (not (nil? (some io/file-exists? (pkg-files proj pm dep)))))
+
+(defn- install!
+  "Install a dependency locally."
+  [pm [id ver]]
+  (.InstallPackage pm (str id) (semver ver) false false))
+
+(defn- ensure-installed! [proj pm dep]
+  (when (not (installed? proj pm dep))
+    (println "Installing" dep)
+    (install! pm dep)))
+
+(defn- find-package [repo [id ver]]
+  (.FindPackage repo id (semver ver)))
+
+#_(defn libs
+  "Gets all the library files in all dependency packages."
+  [{:keys [packages-dir target-framework dependencies] :as proj}]
+  (let [repo (local-repo proj)]
+    (->> dependencies
+         (map (partial find-package repo))
+         (remove nil?))))
 
 (defn deps
   "Fetch dependencies defined in the project file."
-  [{:keys [dependencies] :as project} & _]
-  (let [package-manager (make-package-manager project)]
-    (doseq [dependency dependencies]
-      (ensure-package-installed! project package-manager dependency))))
+  [{:keys [dependencies] :as proj} & _]
+  (let [pm (package-mgr proj)]
+    (doseq [dep dependencies]
+      (ensure-installed! proj pm dep)))
+  #_(println "Libs:" (pr-str (libs proj))))

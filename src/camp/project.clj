@@ -33,8 +33,10 @@
   "Defines a project."
   [project-name version & args]
   `(let [args# ~(merge {:target-framework "net40"
-                        :repository "https://nuget.org/api/v2"
-                        :root (io/current-directory)}
+                        :nuget-repository "https://nuget.org/api/v2"
+                        :root (io/current-directory)
+                        :packages-dir (io/file (io/current-directory) "packages")
+                        :dependencies [['Clojure "1.6.0.1"]]}
                        (apply hash-map (unquote-project args))
                        {:name (str project-name)
                         :version version})]
