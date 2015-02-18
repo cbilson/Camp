@@ -32,7 +32,10 @@
 (defmacro defproject
   "Defines a project."
   [project-name version & args]
-  `(let [args# ~(merge (apply hash-map (unquote-project args))
+  `(let [args# ~(merge {:target-framework "net40"
+                        :repository "https://nuget.org/api/v2"
+                        :root (io/current-directory)}
+                       (apply hash-map (unquote-project args))
                        {:name (str project-name)
                         :version version})]
      (def ~'project args#)))

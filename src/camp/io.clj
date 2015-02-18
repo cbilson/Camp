@@ -14,6 +14,9 @@
   [name]
   (Directory/Exists name))
 
+(defn current-directory []
+  (Directory/GetCurrentDirectory))
+
 (defn file-exists?
   "Check to see if a file exists."
   [name]
