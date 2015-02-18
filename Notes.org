@@ -1,6 +1,7 @@
 * Features
 
-** WIP new command						     :v0_1_0:
+** DONE new command						     :v0_1_0:
+   CLOSED: [2015-02-18 Wed 08:36]
 
    #+BEGIN_SRC shell
      camp new myapp
@@ -13,11 +14,13 @@
      - includes lein-esque deps
    - add src/myapp/core.clj
 
-** BACKLOG deps command 					     :v1_0_1_0:
+** DONE deps command						   :v1_0_1_0:
+   CLOSED: [2015-02-18 Wed 08:36]
    - fetch deps from nuget
-     - or maybe look at packet?
+   - be able to gather all target framework compatible libs, content,
+     and tools.
 
-** BACKLOG compile command                                           :v_0_1_0:
+** WIP compile command						    :v_0_1_0:
    - fetch deps in not already there
    - construct a Clojure.Compiler command line
    - output goes in targets dir
@@ -72,3 +75,8 @@
       Maui, then even less stuff somewhere else...
 
 *** Camping is just fun
+* Notes
+
+** Clojure Compiler
+
+   - [[http://clojureclr.blogspot.com/2012/01/compiling-and-loading-in-clojureclr.html][Compiling and loading in ClojureCLR]]
