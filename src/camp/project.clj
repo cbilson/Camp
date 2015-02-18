@@ -29,14 +29,17 @@
   [args]
   (walk/walk unquote-step identity args))
 
+(def project-defaults
+  {:target-framework "net40"
+   :nuget-repository "https://nuget.org/api/v2"
+   :root (io/current-directory)
+   :packages-dir (io/file (io/current-directory) "packages")
+   :dependencies [['Clojure "1.6.0.1"]]})
+
 (defmacro defproject
   "Defines a project."
   [project-name version & args]
-  `(let [args# ~(merge {:target-framework "net40"
-                        :nuget-repository "https://nuget.org/api/v2"
-                        :root (io/current-directory)
-                        :packages-dir (io/file (io/current-directory) "packages")
-                        :dependencies [['Clojure "1.6.0.1"]]}
+  `(let [args# ~(merge project-defaults
                        (apply hash-map (unquote-project args))
                        {:name (str project-name)
                         :version version})]
