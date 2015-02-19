@@ -141,3 +141,37 @@
 ** ClojureScript
    - If we make a nuget package for it, we could make a camp task to
      compile ClojureScript.
+
+** How I work on camp
+
+*** 0.1.0
+   - In emacs, with projectile, clojure-mode
+   - I have my compile command set to something like:
+     
+     #+BEGIN_SRC shell
+     msbuild /t:CampExe /verbosity:minimal && targets\camp.main.exe ...
+     #+END_SRC
+
+   - When I was making the new task, I created a scratch project like:
+
+     #+BEGIN_SRC shell
+     targets\camp.main.exe new scratch-project
+     #+END_SRC
+
+   - For other tasks, I just cd into the scratch project and run camp
+     out of targets. Like right now, working on compile task:
+
+     #+BEGIN_SRC shell
+       msbuild /t:CampExe /verbosity:minimal && \
+         cd scratch-project && \
+         ..\targets\camp.main.exe compile
+     #+END_SRC
+
+   - With the NGen'd compiler being so fast, I have been using println
+     debugging and just looking at the *compilation* buffer
+     output. That has been working pretty well so far.
+   - Many times, I've really wanted to use a repl, though.
+     - I don't know how well nrepl works with ClojureCLR yet, but it's
+       on my TODO list to investigate this.
+     - I'm not that interested in a plain-old REPL, I want to be able
+       to use the REPL in emacs and eval forms while I am working.
