@@ -1,50 +1,101 @@
 * Features
-
-** DONE new command						     :v0_1_0:
+  
+** DONE new command                                                  :v0_1_0:
    CLOSED: [2015-02-18 Wed 08:36]
-
+   
    #+BEGIN_SRC shell
-     camp new myapp
+   $ camp new myapp
    #+END_SRC
-
+   
    This should:
    - create a new directory
    - add a .gitignore
    - add a project.clj
      - includes lein-esque deps
    - add src/myapp/core.clj
-
-** DONE deps command						   :v1_0_1_0:
+     
+** DONE deps command                                               :v1_0_1_0:
    CLOSED: [2015-02-18 Wed 08:36]
    - fetch deps from nuget
    - be able to gather all target framework compatible libs, content,
      and tools.
-
-** WIP compile command						    :v_0_1_0:
+     
+   #+BEGIN_SRC shell
+   $ camp deps
+   #+END_SRC
+   
+** WIP compile command                                              :v_0_1_0:
    - fetch deps in not already there
    - construct a Clojure.Compiler command line
    - output goes in targets dir
+     
+   #+BEGIN_SRC shell
+   $ camp compile
+   #+END_SRC
+   
+** TODO Licencse :v_0_1_0:
+   - Need to check with MSOT
+     
+** TODO README.md :v_0_1_0:
+   - Give vision
+   - Show example
+   - Mention roadmap
+
+** BACKLOG Annouce :v_0_1_0:
+   - clojure-clr google group
+   - twitter
+   - seajure
+   - reddit
+   - lobste.rs/hackernews, ...
+     
+** BACKLOG Tests for camp itself 				    :v_0_1_1:
+   - Try different testing libs and see which one works.
+   - Strategy: 0.1.0 is a spike. Need to think about maintenance from
+     0.1.1 on wards.
 
 ** BACKLOG repl                                                      :v_0_1_1:
    - just fire up a repl with the project loaded for now.
 
 ** BACKLOG nrepl                                                     :v_0_1_2:
-   - supposedly it "almost works"
+   - read somewhere that it "almost works"
 
 ** BACKLOG templates                                                 :v_0_1_3:
    - I like the way leiningen templates work. Something like that...
+
+** BACKLOG test task :v_0_1_3:
+   - based on experience with lein test and whatever I learn doing
+     tests for camp itself.
 
 ** BACKLOG assembly merging                                          :v_0_1_4:
    - ILMerge has issues.
    - Maybe try Jeffery Richter idea
      - have a stub EXE with assemblies embedded as resources
      - there was some problem with that, though, too, AFAIR.
-   
+
+** BACKLOG assembly attributes                                       :v_0_1_4:
+   - Especially version attributes
+   - [[https://groups.google.com/forum/#!topic/clojure-clr/MgomkqFzP0k][Looks like it might be a pain]].
+   - Check with MSOT: if I can sign contrib agreement, maybe just send
+     a patch.
+   - But then I'm dependent on a future release of ClojureCLR nuget
+     package.
+     
 ** BACKLOG resources                                                 :v_0_1_4:
    Need a way to embed resources in assemblies.
    - resource compiler
    - lots of JVM projects depend on resources and I imagine CLR ones
      will too.
+
+** BACKLOG run task
+   - Is it even needed?
+   - Should be pretty simple to get going.
+
+** BACKLOG Mono?
+   - This is probably really important
+   - Just don't do anything that won't run on mono - keep it simple.
+   - Less worried about building camp itself on mono.
+   - Research how platform works in nuget with mono
+     - Maybe making some bad assumptions in deps.clj?
 
 ** BACKLOG plugins
 
@@ -76,7 +127,16 @@
 
 *** Camping is just fun
 * Notes
-
+  
 ** Clojure Compiler
-
+   
    - [[http://clojureclr.blogspot.com/2012/01/compiling-and-loading-in-clojureclr.html][Compiling and loading in ClojureCLR]]
+
+** NGen
+   - I would hate working on this if I hadn't NGen't
+     Clojure.Compile...so fast!
+   - [[https://groups.google.com/forum/#!searchin/clojure-clr/compile/clojure-clr/LbzsUoJe_h8/Q2Ht3sezQZsJ][x64 vs. x32]]
+
+** ClojureScript
+   - If we make a nuget package for it, we could make a camp task to
+     compile clojurescript.
