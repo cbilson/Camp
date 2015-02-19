@@ -33,15 +33,15 @@
    $ camp compile
    #+END_SRC
    
-** TODO Licencse :v_0_1_0:
+** TODO License :v_0_1_0:
    - Need to check with MSOT
      
 ** TODO README.md :v_0_1_0:
    - Give vision
    - Show example
-   - Mention roadmap
+   - Mention road map
 
-** BACKLOG Annouce :v_0_1_0:
+** BACKLOG Announce :v_0_1_0:
    - clojure-clr google group
    - twitter
    - seajure
@@ -97,7 +97,7 @@
    - Research how platform works in nuget with mono
      - Maybe making some bad assumptions in deps.clj?
 
-** BACKLOG plugins
+** BACKLOG plug-ins
 
 ** BACKLOG compiling other languages
 
@@ -126,6 +126,7 @@
       Maui, then even less stuff somewhere else...
 
 *** Camping is just fun
+
 * Notes
   
 ** Clojure Compiler
@@ -133,10 +134,10 @@
    - [[http://clojureclr.blogspot.com/2012/01/compiling-and-loading-in-clojureclr.html][Compiling and loading in ClojureCLR]]
 
 ** NGen
-   - I would hate working on this if I hadn't NGen't
+   - I would hate working on this if I hadn't NGen'd
      Clojure.Compile...so fast!
    - [[https://groups.google.com/forum/#!searchin/clojure-clr/compile/clojure-clr/LbzsUoJe_h8/Q2Ht3sezQZsJ][x64 vs. x32]]
 
 ** ClojureScript
    - If we make a nuget package for it, we could make a camp task to
-     compile clojurescript.
+     compile ClojureScript.
