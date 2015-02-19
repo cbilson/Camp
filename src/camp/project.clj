@@ -33,7 +33,8 @@
   {:target-framework "net40"
    :nuget-repository "https://nuget.org/api/v2"
    :root (io/current-directory)
-   :packages-dir (io/file (io/current-directory) "packages")
+   :packages-path "packages"
+   :source-paths ["src"]
    :dependencies [['Clojure "1.6.0.1"]]})
 
 (defmacro defproject
