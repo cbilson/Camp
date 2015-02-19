@@ -1,5 +1,5 @@
 (ns camp.io
-  (:import [System.IO Path File Directory]
+  (:import [System.IO Path File Directory SearchOption]
            [clojure.lang PushbackTextReader]))
 
 (defn mkdir
@@ -8,6 +8,14 @@
    (Directory/CreateDirectory (str name)))
   ([name access-control]
    (Directory/CreateDirectory (str name) access-control)))
+
+(defn files
+  ([base-path]
+   (Directory/GetFiles base-path))
+  ([base-path pattern]
+   (Directory/GetFiles base-path pattern))
+  ([base-path pattern option]
+   (Directory/GetFiles base-path pattern (enum-val SearchOption option))))
 
 (defn directory-exists?
   "Check to see if a directory exists."
