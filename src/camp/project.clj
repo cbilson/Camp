@@ -35,6 +35,7 @@
    :root (io/current-directory)
    :packages-path "packages"
    :source-paths ["src"]
+   :targets-path "targets"
    :dependencies [['Clojure "1.6.0.1"]]})
 
 (defmacro defproject
