@@ -26,11 +26,11 @@
   (println  "  :dependencies [[Clojure \"1.6.0.1\"]])"))
 
 (defn core-clj [name]
-  (println "(ns" name)
+  (println "(ns" name ".core")
   (println "  (:gen-class))")
   (println "")
   (println "(defn -main [& args]")
-  (println "  (println \"TODO: something\")"))
+  (println "  (println \"TODO: something\"))"))
 
 (defn write-template [fname template-fn & args]
   (with-open [writer (io/text-writer fname)]
