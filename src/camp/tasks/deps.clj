@@ -14,14 +14,14 @@
             VersionUtility]))
 
 (defn local-repo [project]
-  (LocalPackageRepository. (:packages-dir project)))
+  (LocalPackageRepository. (:packages-path project)))
 
 (defn remote-repo [project]
   (.CreateRepository PackageRepositoryFactory/Default
                      (:nuget-repository project)))
 
 (defn package-mgr [project]
-  (PackageManager. (remote-repo project) (:packages-dir project)))
+  (PackageManager. (remote-repo project) (:packages-path project)))
 
 (defn- semver [version]
   (SemanticVersion/Parse version))
@@ -38,7 +38,7 @@
 
 (defn- pkg-files [proj pm [id ver]]
   (let [repo (.LocalRepository pm)]
-    (map (partial io/file (:packages-dir proj))
+    (map (partial io/file (:packages-path proj))
          (.GetPackageLookupPaths repo (str id) (semver ver)))))
 
 (defn- installed?
@@ -72,13 +72,13 @@
 (defn- compatible-files
   ([proj selector]
    (mapcat (partial compatible-files proj selector) (:dependencies proj)))
-  ([{packages-dir :packages-dir :as proj} selector dep]
+  ([{packages-path :packages-path :as proj} selector dep]
    (let [pm (package-mgr proj)
          pkg (find-package pm dep)]
      (->> pkg
           selector
           (filter (partial target-framework? proj))
-          (map (partial io/file packages-dir (full-name pkg)))))))
+          (map (partial io/file packages-path (full-name pkg)))))))
 
 (defn libs
   "Get the libs from all the dependencies in the project."
