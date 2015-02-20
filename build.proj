@@ -68,6 +68,21 @@
 	  WorkingDirectory="$(SourceDir)" />
   </Target>
 
+  <Target Name="TestNew" DependsOnTargets="CampExe">
+    <Exec Command="targets\camp.main.exe new scratch-project"
+	  WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
+
+  <Target Name="TestDeps" DependsOnTargets="CampExe">
+    <Exec Command="..\targets\camp.main.exe deps"
+	  WorkingDirectory="$(MSBuildThisFileDirectory)\scratch-project" />
+  </Target>
+
+  <Target Name="TestCompile" DependsOnTargets="CampExe">
+    <Exec Command="..\targets\camp.main.exe compile"
+	  WorkingDirectory="$(MSBuildThisFileDirectory)\scratch-project" />
+  </Target>
+
   <Target Name="Clean">
     <Delete Files="@(TargetBinaries)" />
     <Delete Files="@(ClojureCompilerOutput)" />
