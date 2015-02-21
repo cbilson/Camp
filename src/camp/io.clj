@@ -46,5 +46,11 @@
 
 (def path-separator (str (Path/PathSeparator)))
 
+(defn file-name-only [file-name]
+  (Path/GetFileName file-name))
+
 (defn file-name-without-extension [file-name]
   (Path/GetFileNameWithoutExtension file-name))
+
+(defn copy [src dst]
+  (File/Copy src dst))
