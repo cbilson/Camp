@@ -67,7 +67,7 @@
   (some (partial = (framework proj)) (.SupportedFrameworks ft)))
 
 (defn- full-name [^IPackage pkg]
-  (str (.Id pkg) (.Version pkg)))
+  (str (.Id pkg) "." (.Version pkg)))
 
 (defn- compatible-files
   ([proj selector]
