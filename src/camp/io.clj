@@ -41,3 +41,10 @@
   for some reason."
   [path]
   (PushbackTextReader. (File/OpenText path)))
+
+(def directory-separator (str (Path/DirectorySeparatorChar)))
+
+(def path-separator (str (Path/PathSeparator)))
+
+(defn file-name-without-extension [file-name]
+  (Path/GetFileNameWithoutExtension file-name))
