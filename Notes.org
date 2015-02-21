@@ -24,8 +24,10 @@
    $ camp deps
    #+END_SRC
    
-** WIP compile command                                              :v_0_1_0:
+** DONE compile command						    :v_0_1_0:
+   CLOSED: [2015-02-21 Sat 08:54]
    - fetch deps in not already there
+     - Oops, forgot about this part. I'll get to it later.
    - construct a Clojure.Compiler command line
    - output goes in targets dir
      
@@ -42,6 +44,7 @@
    - Mention road map
 
 ** BACKLOG Announce :v_0_1_0:
+   - screen casts
    - clojure-clr google group
    - twitter
    - seajure
@@ -87,6 +90,7 @@
    - lots of JVM projects depend on resources and I imagine CLR ones
      will too.
 
+** BACKLOG fix compile task to check deps  :v_0_1_4:bug:
 ** BACKLOG run task
    - Is it even needed?
    - Should be pretty simple to get going.
@@ -127,6 +131,10 @@
       Maui, then even less stuff somewhere else...
 
 *** Camping is just fun
+
+
+** eval-in-project
+   - Leverage app domains to make it easier to eval-in-project
 
 * Notes
   
