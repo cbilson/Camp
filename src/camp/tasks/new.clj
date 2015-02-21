@@ -26,7 +26,7 @@
   (println  "  :dependencies [[Clojure \"1.6.0.1\"]])"))
 
 (defn core-clj [name]
-  (println "(ns" name ".core")
+  (println "(ns"(str name ".core"))
   (println "  (:gen-class))")
   (println "")
   (println "(defn -main [& args]")
