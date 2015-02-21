@@ -12,6 +12,7 @@
     <PackagesDir Condition=" '$(PackagesDir)'=='' ">$(MSBuildThisFileDirectory)packages</PackagesDir>
     <ClojurePackageDir Condition=" '$(ClojurePackageDir)'==''">$(PackagesDir)\Clojure.1.6.0.1\</ClojurePackageDir>
     <TargetsDir Condition=" '$(TargetsDir)'=='' ">$(MSBuildThisFileDirectory)targets\</TargetsDir>
+    <TestProjectName Condition=" '$(TestProjectName)'=='' ">tstproj</TestProjectName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,30 +58,29 @@
   </Target>
 
   <Target Name="Package" DependsOnTargets="CampExe">
-    <!-- for later, when I want to distribute this -->
-    <!-- rename camp.main.exe to something shorter -->
-    <Move SourceFiles="$(SourceDir)camp.main.exe"
-          DestinationFiles="$(TargetsDir)camp.exe" />
+    <!-- TODO: Nuget package -->
   </Target>
 
   <Target Name="Compile">
     <Exec Command="$(ClojureCompiler) @(ClojureSources, ' ')"
 	  WorkingDirectory="$(SourceDir)" />
+    <Move SourceFiles="$(TargetsDir)camp.main.exe"
+          DestinationFiles="$(TargetsDir)camp.exe" />
   </Target>
 
   <Target Name="TestNew" DependsOnTargets="CampExe">
-    <Exec Command="targets\camp.main.exe new scratch-project"
+    <Exec Command="targets\camp.main.exe new $(TestProjectName)"
 	  WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
 
   <Target Name="TestDeps" DependsOnTargets="CampExe">
     <Exec Command="..\targets\camp.main.exe deps"
-	  WorkingDirectory="$(MSBuildThisFileDirectory)\scratch-project" />
+	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
   </Target>
 
   <Target Name="TestCompile" DependsOnTargets="CampExe">
     <Exec Command="..\targets\camp.main.exe compile"
-	  WorkingDirectory="$(MSBuildThisFileDirectory)\scratch-project" />
+	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
   </Target>
 
   <Target Name="Clean">
