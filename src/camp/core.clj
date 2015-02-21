@@ -22,3 +22,8 @@
   ([name default-value]
    (or (Environment/GetEnvironmentVariable name)
        default-value)))
+
+(defn setenv
+  "Sets an environment variable's value."
+  ([name value]
+   (Environment/SetEnvironmentVariable name value)))
