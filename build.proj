@@ -69,6 +69,7 @@
   </Target>
 
   <Target Name="TestNew" DependsOnTargets="CampExe">
+    <Delete Files="$(TestProjectName)" />
     <Exec Command="targets\camp.main.exe new $(TestProjectName)"
 	  WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
@@ -81,6 +82,14 @@
   <Target Name="TestCompile" DependsOnTargets="CampExe">
     <Exec Command="..\targets\camp.main.exe compile"
 	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
+  </Target>
+
+  <Target Name="TestRunTarget" DependsOnTargets="CampExe">
+    <Message Text="Target output:" Importance="high" />
+    <Message Text="----------------------------------------" Importance="high" />
+    <Exec Command="$(TestProjectName).core.exe"
+	  WorkingDirectory="$(TestProjectName)\targets" />
+    <Message Text="----------------------------------------" Importance="high" />
   </Target>
 
   <Target Name="Clean">
