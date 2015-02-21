@@ -53,6 +53,7 @@
    - Strategy: 0.1.0 is a spike. Need to think about maintenance from
      0.1.1 on wards.
 
+** BACKLOG clean task   :v_0_1_1:
 ** BACKLOG repl                                                      :v_0_1_1:
    - just fire up a repl with the project loaded for now.
 
@@ -132,6 +133,28 @@
 ** Clojure Compiler
    
    - [[http://clojureclr.blogspot.com/2012/01/compiling-and-loading-in-clojureclr.html][Compiling and loading in ClojureCLR]]
+   - `clojure.core/compile' calls /load, then eventually,
+     `clojure.lang.RT/load'.
+     - clojure.core/compile also binds *compile-files* true.
+   - If the .clj file is newer than the .clj.dll, it compiles the source file.
+   - It looks at `Compiler.CompileFilesVar.' to determine if it wants to 
+     Compile or LoadScript.
+   - The clojure symbol for CompileFilesVar is
+     `clojure.core/*compile-files*' and it defaults to false.
+   - Eventually this makes it's way to clojure.lang.Compiler.Compile.
+   - This uses a GenContext, a TypeBuilder, and a CljILGen to generate
+     IL into the context, then finally save it to an assembly with
+     GenContext::SaveAssembly.
+   - GenContext::SaveAssembly uses the DLR to actually write out the assembly.
+   - *compile-path* is where the assemblies go, _not_ where it expects to
+     find src files.
+   - When looking for source files, the compiler looks at the environment
+     variable CLOJURE_LOAD_PATH, in addition to a bunch of other places.
+     - CLOJURE_LOAD_PATH can contain multiple paths delimited by
+       Path.PathSeparator.
+   - clojure.core/*compiler-options*
+     - {:elide-meta #{:some-key :some-other-key}
+        :disable-locals-clearing true|false{}
 
 ** NGen
    - I would hate working on this if I hadn't NGen'd
