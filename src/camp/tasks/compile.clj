@@ -1,6 +1,7 @@
 (ns camp.tasks.compile
   (:refer-clojure :exclude [compile])
   (:require [clojure.string :as str]
+            [camp.core :as core]
             [camp.io :as io]
             [camp.tasks.deps :as deps]))
 
@@ -15,29 +16,54 @@
       (str/replace #".clj$" "")
       symbol))
 
-(defn- compile-source-file [source-dir source-file]
+(defn- compile-source-file
+  "Compile a single source file."
+  [source-dir source-file]
   (let [target-ns (source-file->target-ns source-dir source-file)]
     (println "compiling" target-ns)
     (clojure.core/compile target-ns)))
 
-(defn- compile-source-directory [source-dir]
+(defn- compile-source-directory
+  "Compile one source directory in the project."
+  [source-dir]
   (doseq [source-file (io/files source-dir "*.clj" :AllDirectories)]
     (compile-source-file source-dir source-file)))
 
-(defn compile
-  "Compile the project into assemblies and exes."
-  [{:keys [source-paths targets-path] :as proj} & _]
-  (when (not (io/directory-exists? targets-path))
-    (io/mkdir targets-path))
-  (let [original-load-path (Environment/GetEnvironmentVariable
-                            "CLOJURE_LOAD_PATH")
+(defn- compile-all-source-directories
+  "Compile each source directory in the project."
+  [{source-paths :source-paths}]
+  (doseq [source-dir source-paths]
+    (compile-source-directory source-dir)))
+
+(defn- with-compile-env
+  "Setup environment variables and binding to compile the project,
+  invoke some function in that environment, and cleanup afterwords."
+  [{:keys [targets-path source-paths] :as project} f]
+  (let [original-load-path (core/getenv "CLOJURE_LOAD_PATH")
         new-load-path (str/join ";" source-paths)]
     (try
-      (Environment/SetEnvironmentVariable "CLOJURE_LOAD_PATH" new-load-path)
+      (core/setenv "CLOJURE_LOAD_PATH" new-load-path)
       (binding [clojure.core/*compile-path* targets-path
                 clojure.core/*compile-files* true]
-        (doseq [source-dir source-paths]
-          (compile-source-directory source-dir)))
+        (f project))
       (finally
-        (Environment/SetEnvironmentVariable "CLOJURE_LOAD_PATH"
-                                            original-load-path)))))
+        (core/setenv "CLOJURE_LOAD_PATH" original-load-path)))))
+
+(defn- copy-dep-libs
+  "Make sure libs from all of the project's dependencies are in the
+  targets directory."
+  [{:keys [targets-path] :as proj}]
+  (doseq [source-file-name (deps/libs proj)]
+    (let [file-name (io/file-name-only source-file-name)
+          destination-file-name (io/file targets-path file-name)]
+      (when (not (io/file-exists? destination-file-name))
+        (io/copy source-file-name destination-file-name)))))
+
+(defn compile
+  "Compile the project into assemblies and exes."
+  [{:keys [targets-path] :as proj} & _]
+  (deps/deps proj)
+  (when (not (io/directory-exists? targets-path))
+    (io/mkdir targets-path))
+  (copy-dep-libs proj)
+  (with-compile-env proj compile-all-source-directories))
