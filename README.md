@@ -47,10 +47,6 @@ $ msbuild /t:CampExe
 
 Put everything in the targets directory into your path somehow.
 
-Note: Someday, I'll add a step to the build to rename `camp.main.exe`,
-but for now, wherever it says `camp` below, you'll need to to say
-`camp.main.exe` instead.
-
 ## How to Use
 
 ```shell

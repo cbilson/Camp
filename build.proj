@@ -70,17 +70,17 @@
 
   <Target Name="TestNew" DependsOnTargets="CampExe">
     <Delete Files="$(TestProjectName)" />
-    <Exec Command="targets\camp.main.exe new $(TestProjectName)"
+    <Exec Command="targets\camp.exe new $(TestProjectName)"
 	  WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
 
   <Target Name="TestDeps" DependsOnTargets="CampExe">
-    <Exec Command="..\targets\camp.main.exe deps"
+    <Exec Command="..\targets\camp.exe deps"
 	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
   </Target>
 
   <Target Name="TestCompile" DependsOnTargets="CampExe">
-    <Exec Command="..\targets\camp.main.exe compile"
+    <Exec Command="..\targets\camp.exe compile"
 	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
   </Target>
 
