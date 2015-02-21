@@ -167,7 +167,8 @@
 
 ** How I work on camp
 
-*** 0.1.0
+*** 2014-02-18
+
    - In emacs, with projectile, clojure-mode
    - I have my compile command set to something like:
      
@@ -198,3 +199,5 @@
        on my TODO list to investigate this.
      - I'm not that interested in a plain-old REPL, I want to be able
        to use the REPL in emacs and eval forms while I am working.
+*** 2014-02-21
+    I added build targets for testing, so "msbuild /verbosity:minimal /t:TestCompile", etc.
