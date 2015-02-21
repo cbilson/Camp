@@ -38,7 +38,7 @@
 ** TODO License :v_0_1_0:
    - Need to check with MSOT
      
-** TODO README.md :v_0_1_0:
+** WIP README.md						    :v_0_1_0:
    - Give vision
    - Show example
    - Mention road map
@@ -90,7 +90,9 @@
    - lots of JVM projects depend on resources and I imagine CLR ones
      will too.
 
-** BACKLOG fix compile task to check deps  :v_0_1_4:bug:
+** DONE fix compile task to check deps				:v_0_1_4:bug:
+   CLOSED: [2015-02-21 Sat 11:31]
+   
 ** BACKLOG run task
    - Is it even needed?
    - Should be pretty simple to get going.
