@@ -43,6 +43,12 @@
    - Show example
    - Mention road map
 
+** BACKLOG Packaging
+   - nuget package
+   - chocolatey package
+     - This is easy and will add a lot of value in not making people
+       have to futz with their PATH.
+
 ** BACKLOG Announce :v_0_1_0:
    - screen casts
    - clojure-clr google group
