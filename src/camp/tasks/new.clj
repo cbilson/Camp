@@ -48,4 +48,6 @@
   (write-template (cio/file name ".gitignore") gitignore)
   (cio/mkdir (cio/file name "src"))
   (cio/mkdir (cio/file name "src" name))
-  (write-template (cio/file name "src" name "core.clj") core-clj name))
+  (write-template (cio/file name "src" name "core.clj") core-clj name)
+  (println "Created a new ClojureCLR camp project named" name
+           "in the directory" name))
