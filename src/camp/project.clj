@@ -36,6 +36,7 @@
    :packages-path "packages"
    :source-paths ["src"]
    :targets-path "targets"
+   :error? true :warn? true :info? true :verbose? true :debug? true
    :dependencies [['Clojure "1.6.0.1"]]})
 
 (defmacro defproject

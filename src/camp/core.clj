@@ -27,3 +27,18 @@
   "Sets an environment variable's value."
   ([name value]
    (Environment/SetEnvironmentVariable name value)))
+
+(defn print-when [flag messages]
+  (when flag (apply println messages)))
+
+(defn verbose [{verbose? :verbose?} & messages]
+  (print-when verbose? messages))
+
+(defn info [{info? :info?} & messages]
+  (print-when info? messages))
+
+(defn warn [{warn? :warn?} & messages]
+  (print-when warn? messages))
+
+(defn error [{error? :error?} & messages]
+  (print-when error? messages))
