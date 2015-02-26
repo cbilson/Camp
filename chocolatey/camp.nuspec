@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Do not remove this test for UTF-8: if “Ω” doesn’t appear as greek uppercase omega letter enclosed in quotation marks, you should use an editor that supports UTF-8, not this one. -->
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>camp.portable</id>
+    <title>camp (Portable)</title>
+    <version>0.1.0-alpha</version>
+    <authors>Chris Bilson</authors>
+    <owners>Chris Bilson</owners>
+    <summary>Camp helps setup your ClojureCLR tent.</summary>
+    <description>
+      Camp is a tool to make it easy to use ClojureCLR.
+
+      - Create a new project.
+      - Fetch dependencies.
+      - Compile it.
+      - Run it.
+      - Open a REPL on it.
+      - Package and deploy to nuget.org.
+    </description>
+    <projectUrl>https://github.com/cbilson/camp</projectUrl>
+    <tags>camp admin</tags>
+    <copyright>Chris Bilson, 2015</copyright>
+    <licenseUrl>https://raw.githubusercontent.com/cbilson/camp/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--<iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/camp.png</iconUrl>-->
+    <!--<dependencies>
+      <dependency id="" version="__VERSION__" />
+      <dependency id="" />
+    </dependencies>-->
+    <releaseNotes>Initial release.</releaseNotes>
+  </metadata>
+  <files>
+    <file src="targets\**" target="chocolatey\tools" />
+  </files>
+</package>

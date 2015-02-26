@@ -33,6 +33,7 @@
     <ExtensionTasksPath Condition=" '$(ExtensionTasksPath)'=='' ">$(PackagesDir)\MSBuild.Extension.Pack.1.5.0\tools\net40</ExtensionTasksPath>
     <TargetsDir Condition=" '$(TargetsDir)'=='' ">$(MSBuildThisFileDirectory)targets</TargetsDir>
     <TestProjectName Condition=" '$(TestProjectName)'=='' ">tstproj</TestProjectName>
+    <ChocoExe>$(MSBuildThisFileDirectory)\packages\chocolatey.0.9.9-rc8\tools\chocolateyInstall\choco.exe</ChocoExe>
   </PropertyGroup>
 
   <ItemGroup>
@@ -84,10 +85,6 @@
     <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" />
   </Target>
 
-  <Target Name="Package" DependsOnTargets="CampExe">
-    <!-- TODO: Nuget package -->
-  </Target>
-
   <Target Name="Compile">
     <SetEnvironmentVariable Name="CLOJURE_COMPILE_PATH" Value="$(TargetsDir)" />
     <Exec Command="$(ClojureCompiler) @(ClojureSources, ' ')"
@@ -120,9 +117,20 @@
     <Message Text="----------------------------------------" Importance="high" />
   </Target>
 
+  <Target Name="Package" DependsOnTargets="ChocolateyPackage" />
+
+  <Target Name="ChocolateyPackage" DependsOnTargets="CampExe">
+    <Exec Command="$(ChocoExe) pack chocolatey\camp.nuspec" />
+  </Target>
+
+  <Target Name="ChocoInstall" DependsOnTargets="ChocolateyPackage">
+    <Exec Command="$(ChocoExe) install --debug --force --pre --source chocolatey camp.portable" />
+  </Target>
+
   <Target Name="Clean">
     <Delete Files="@(TargetBinaries)" />
     <Delete Files="@(ClojureCompilerOutput)" />
+    <Delete Files="chocolatey\camp*.nupkg" />
   </Target>
 
 </Project>
