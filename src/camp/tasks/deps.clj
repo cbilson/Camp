@@ -1,4 +1,11 @@
-(assembly-load-from "..\\targets\\NuGet.Core.dll")
+(let [nuget-assembly
+      (System.IO.Path/Combine
+       (.BaseDirectory System.AppDomain/CurrentDomain)
+       "NuGet.Core.dll")]
+  (if (System.IO.File/Exists nuget-assembly)
+    (assembly-load-from nuget-assembly)
+    ;; at compile time, load from targets directory
+    (assembly-load-from "..\\targets\\NuGet.Core.dll")))
 
 (ns camp.tasks.deps
   "Functions for managing dependencies in the project."
