@@ -3,15 +3,35 @@
          DefaultTargets="Build"
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
+  <UsingTask TaskName="SetEnvironmentVariable"
+	     TaskFactory="CodeTaskFactory"
+	     AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
+
+    <ParameterGroup>
+      <Name ParameterType="System.String" Required="true" />
+      <Value ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+
+    <Task>
+      <Using Namespace="System" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+                 Environment.SetEnvironmentVariable(Name, Value);
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+  
   <PropertyGroup>
     <OutDir Condition=" '$(OutDir)'=='' ">$(MSBuildThisFileDirectory)bin\</OutDir>
     <Configuration Condition=" '$(Configuration)'=='' ">Debug</Configuration>
-    <SourceDir Condition=" '$(SourceDir)'=='' ">$(MSBuildThisFileDirectory)src\</SourceDir>
+    <SourceDir Condition=" '$(SourceDir)'=='' ">$(MSBuildThisFileDirectory)src</SourceDir>
     <ToolsDir Condition=" '$(ToolsDir)'=='' ">$(MSBuildThisFileDirectory)tools\</ToolsDir>
     <ClojureCompiler Condition=" '$(ClojureCompiler)'==''">$(MSBuildThisFileDirectory)tools\Clojure.Compile.exe</ClojureCompiler>
     <PackagesDir Condition=" '$(PackagesDir)'=='' ">$(MSBuildThisFileDirectory)packages</PackagesDir>
     <ClojurePackageDir Condition=" '$(ClojurePackageDir)'==''">$(PackagesDir)\Clojure.1.6.0.1\</ClojurePackageDir>
-    <TargetsDir Condition=" '$(TargetsDir)'=='' ">$(MSBuildThisFileDirectory)targets\</TargetsDir>
+    <ExtensionTasksPath Condition=" '$(ExtensionTasksPath)'=='' ">$(PackagesDir)\MSBuild.Extension.Pack.1.5.0\tools\net40</ExtensionTasksPath>
+    <TargetsDir Condition=" '$(TargetsDir)'=='' ">$(MSBuildThisFileDirectory)targets</TargetsDir>
     <TestProjectName Condition=" '$(TestProjectName)'=='' ">tstproj</TestProjectName>
   </PropertyGroup>
 
@@ -38,8 +58,8 @@
     <!-- Clojure.Compile wants the source namespace names, not files -->
     <ClojureSources Include="camp.core" />
     <ClojureSources Include="camp.main" />
-    <ClojureSources Include="camp.project" />
     <ClojureSources Include="camp.tasks.compile" />
+    <ClojureSources Include="camp.project" />
     <ClojureSources Include="camp.tasks.deps" />
     <ClojureSources Include="camp.tasks.help" />
     <ClojureSources Include="camp.tasks.new" />
@@ -47,13 +67,20 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ClojureCompilerOutput Include="$(SourceDir)**\*.dll;$(SourceDir)**\*.exe" />
-    <TargetBinaries Include="$(TargetsDir)**" />
+    <ClojureCompilerOutput Include="$(SourceDir)\**\*.dll;$(SourceDir)\**\*.exe" />
+    <TargetBinaries Include="$(TargetsDir)\**" />
   </ItemGroup>
 
-  <Target Name="CampExe" DependsOnTargets="Compile">
-    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(TargetsDir)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(Libs)" DestinationFolder="$(TargetsDir)" SkipUnchangedFiles="true" />
+  <Target Name="InitTargetsDir">
+    <Copy SourceFiles="@(ClojureLibs)"
+	  DestinationFolder="$(TargetsDir)"
+	  SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(Libs)"
+	  DestinationFolder="$(TargetsDir)"
+	  SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CampExe" DependsOnTargets="InitTargetsDir;Compile">
     <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" />
   </Target>
 
@@ -62,33 +89,34 @@
   </Target>
 
   <Target Name="Compile">
+    <SetEnvironmentVariable Name="CLOJURE_COMPILE_PATH" Value="$(TargetsDir)" />
     <Exec Command="$(ClojureCompiler) @(ClojureSources, ' ')"
-	  WorkingDirectory="$(SourceDir)" />
-    <Move SourceFiles="$(TargetsDir)camp.main.exe"
-          DestinationFiles="$(TargetsDir)camp.exe" />
+          WorkingDirectory="$(SourceDir)" />
+    <Move SourceFiles="$(TargetsDir)\camp.main.exe"
+          DestinationFiles="$(TargetsDir)\camp.exe" />
   </Target>
 
   <Target Name="TestNew" DependsOnTargets="CampExe">
     <Delete Files="$(TestProjectName)" />
     <Exec Command="targets\camp.exe new $(TestProjectName)"
-	  WorkingDirectory="$(MSBuildThisFileDirectory)" />
+          WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
 
   <Target Name="TestDeps" DependsOnTargets="CampExe">
     <Exec Command="..\targets\camp.exe deps"
-	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
+          WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
   </Target>
 
   <Target Name="TestCompile" DependsOnTargets="CampExe">
     <Exec Command="..\targets\camp.exe compile"
-	  WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
+          WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
   </Target>
 
   <Target Name="TestRunTarget" DependsOnTargets="CampExe">
     <Message Text="Target output:" Importance="high" />
     <Message Text="----------------------------------------" Importance="high" />
     <Exec Command="$(TestProjectName).core.exe"
-	  WorkingDirectory="$(TestProjectName)\targets" />
+          WorkingDirectory="$(TestProjectName)\targets" />
     <Message Text="----------------------------------------" Importance="high" />
   </Target>
 
