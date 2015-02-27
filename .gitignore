@@ -8,3 +8,4 @@
 \#*#
 /tstproj/
 *.nupkg
+/tools/NuGet.Core.dll
