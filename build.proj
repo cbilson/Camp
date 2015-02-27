@@ -4,8 +4,8 @@
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <UsingTask TaskName="SetEnvironmentVariable"
-	     TaskFactory="CodeTaskFactory"
-	     AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
+             TaskFactory="CodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v$(MSBuildToolsVersion).dll">
 
     <ParameterGroup>
       <Name ParameterType="System.String" Required="true" />
@@ -21,73 +21,78 @@
       </Code>
     </Task>
   </UsingTask>
-  
+
   <PropertyGroup>
-    <OutDir Condition=" '$(OutDir)'=='' ">$(MSBuildThisFileDirectory)bin\</OutDir>
-    <Configuration Condition=" '$(Configuration)'=='' ">Debug</Configuration>
-    <SourceDir Condition=" '$(SourceDir)'=='' ">$(MSBuildThisFileDirectory)src</SourceDir>
-    <ToolsDir Condition=" '$(ToolsDir)'=='' ">$(MSBuildThisFileDirectory)tools\</ToolsDir>
-    <ClojureCompiler Condition=" '$(ClojureCompiler)'==''">$(MSBuildThisFileDirectory)tools\Clojure.Compile.exe</ClojureCompiler>
-    <PackagesDir Condition=" '$(PackagesDir)'=='' ">$(MSBuildThisFileDirectory)packages</PackagesDir>
-    <ClojurePackageDir Condition=" '$(ClojurePackageDir)'==''">$(PackagesDir)\Clojure.1.6.0.1\</ClojurePackageDir>
-    <ExtensionTasksPath Condition=" '$(ExtensionTasksPath)'=='' ">$(PackagesDir)\MSBuild.Extension.Pack.1.5.0\tools\net40</ExtensionTasksPath>
-    <TargetsDir Condition=" '$(TargetsDir)'=='' ">$(MSBuildThisFileDirectory)targets</TargetsDir>
-    <TestProjectName Condition=" '$(TestProjectName)'=='' ">tstproj</TestProjectName>
+    <OutDir>$(MSBuildThisFileDirectory)bin\</OutDir>
+    <Configuration>Debug</Configuration>
+    <SourceDir>$(MSBuildThisFileDirectory)src</SourceDir>
+    <ToolsDir>$(MSBuildThisFileDirectory)tools\</ToolsDir>
+    <ClojureCompiler>$(MSBuildThisFileDirectory)tools\Clojure.Compile.exe</ClojureCompiler>
+    <PackagesDir>$(MSBuildThisFileDirectory)packages</PackagesDir>
+    <ClojurePackageDir>$(PackagesDir)\Clojure.1.6.0.1\</ClojurePackageDir>
+    <ExtensionTasksPath>$(PackagesDir)\MSBuild.Extension.Pack.1.5.0\tools\net40</ExtensionTasksPath>
+    <TargetsDir>$(MSBuildThisFileDirectory)targets</TargetsDir>
+    <TestProjectName>tstproj</TestProjectName>
     <ChocoExe>$(MSBuildThisFileDirectory)\packages\chocolatey.0.9.9-rc8\tools\chocolateyInstall\choco.exe</ChocoExe>
   </PropertyGroup>
 
   <ItemGroup>
-    <ClojureTools Include="$(ClojurePackageDir)tools\net40\*" />
-    <ClojureLibs Include="$(ClojurePackageDir)lib\net40\*" />
+    <Tools Include="$(ClojurePackageDir)tools\net40\*" />
   </ItemGroup>
 
   <ItemGroup>
+    <Libs Include="$(ClojurePackageDir)lib\net40\*.dll" />
     <Libs Include="$(PackagesDir)\Nuget.Core.2.8.3\lib\net40-Client\NuGet.Core.dll" />
   </ItemGroup>
 
-  <Target Name="RestorePackages">
-    <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
-
-    <!-- copy clojure compiler tools into tools directory - you can't run them directly from packages... -->
-    <Copy SourceFiles="@(ClojureTools)" DestinationFolder="$(ToolsDir)" SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(ClojureLibs)" DestinationFolder="$(ToolsDir)" SkipUnchangedFiles="true" />
-  </Target>
-
-  <Target Name="Build" DependsOnTargets="RestorePackages;CampExe" />
-
   <ItemGroup>
     <!-- Clojure.Compile wants the source namespace names, not files -->
-    <ClojureSources Include="camp.core" />
-    <ClojureSources Include="camp.main" />
-    <ClojureSources Include="camp.tasks.compile" />
-    <ClojureSources Include="camp.project" />
-    <ClojureSources Include="camp.tasks.deps" />
-    <ClojureSources Include="camp.tasks.help" />
-    <ClojureSources Include="camp.tasks.new" />
-    <ClojureSources Include="camp.tasks.pprint" />
+    <Sources Include="camp.core" />
+    <Sources Include="camp.main" />
+    <Sources Include="camp.tasks.compile" />
+    <Sources Include="camp.project" />
+    <Sources Include="camp.tasks.deps" />
+    <Sources Include="camp.tasks.help" />
+    <Sources Include="camp.tasks.new" />
+    <Sources Include="camp.tasks.pprint" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ClojureCompilerOutput Include="$(SourceDir)\**\*.dll;$(SourceDir)\**\*.exe" />
-    <TargetBinaries Include="$(TargetsDir)\**" />
-  </ItemGroup>
+  <Target Name="Build" DependsOnTargets="RestorePackages;Init;CampExe" />
 
-  <Target Name="InitTargetsDir">
-    <Copy SourceFiles="@(ClojureLibs)"
-	  DestinationFolder="$(TargetsDir)"
-	  SkipUnchangedFiles="true" />
-    <Copy SourceFiles="@(Libs)"
-	  DestinationFolder="$(TargetsDir)"
-	  SkipUnchangedFiles="true" />
+  <Target Name="RestorePackages">
+    <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
   </Target>
 
-  <Target Name="CampExe" DependsOnTargets="InitTargetsDir;Compile">
-    <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" />
+  <Target Name="Init" DependsOnTargets="InitToolsDir;InitTargetsDir" />
+
+  <Target Name="CampExe" DependsOnTargets="Compile">
+    <!-- <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" /> -->
+  </Target>
+
+  <Target Name="InitToolsDir">
+
+    <!-- copy clojure compiler tools into tools directory - you can't run them directly from packages... -->
+    <Copy SourceFiles="@(Tools)"
+          DestinationFolder="$(ToolsDir)"
+          SkipUnchangedFiles="true" />
+
+    <!-- also copy libs to tools directory for compilation time -->
+    <Copy SourceFiles="@(Libs)"
+          DestinationFolder="$(ToolsDir)"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="InitTargetsDir">
+    <!-- copy libs to targets directory for final executable -->
+    <Copy SourceFiles="@(Libs)"
+          DestinationFolder="$(TargetsDir)"
+          SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="Compile">
+    <!-- have compiler output go straight into targets path -->
     <SetEnvironmentVariable Name="CLOJURE_COMPILE_PATH" Value="$(TargetsDir)" />
-    <Exec Command="$(ClojureCompiler) @(ClojureSources, ' ')"
+    <Exec Command="$(ClojureCompiler) @(Sources, ' ')"
           WorkingDirectory="$(SourceDir)" />
     <Move SourceFiles="$(TargetsDir)\camp.main.exe"
           DestinationFiles="$(TargetsDir)\camp.exe" />
@@ -128,8 +133,7 @@
   </Target>
 
   <Target Name="Clean">
-    <Delete Files="@(TargetBinaries)" />
-    <Delete Files="@(ClojureCompilerOutput)" />
+    <!-- TODO: Rest of binaries -->
     <Delete Files="chocolatey\camp*.nupkg" />
   </Target>
 
