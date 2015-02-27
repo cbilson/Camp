@@ -1,17 +1,13 @@
-** RED ALERT **
-
-Pre-usable software ahead.
-
 # camp
 
-Camp is a tool to make it easy to use ClojureCLR.
+Camp is a tool that makes it easy to use ClojureCLR.
 
-- Create a new project.
-- Fetch dependencies.
-- Compile it.
-- Run it.
-- Open a REPL on it.
-- Package and deploy to nuget.org.
+	- Create a new project.
+	- Fetch dependencies.
+	- Compile it.
+	- Run it.
+	- Open a REPL on it.
+	- Package and deploy to nuget.org.
 
 ## Camp Philosophy
 
@@ -23,31 +19,22 @@ hills around Mt. Clojure.
 It tries to stay out of your business but be as helpful and safe as
 possible.
 
-## What about Leiningen
+## How to Use
 
-Leiningen is a shining example of what a development tool should be
-like. Unfortunately, Leiningen is so good that it's being used outside
-of it's comfort zone. Leiningen is perfectly up to the task of
-building ClojureScript and ClojureCLR applications, but to me, feel a
-little alien when used for non-JVM projects. It can't really take full
-advantage of the capabilities of other platforms. I think we can do
-better than to just try and make the same Leiningen do all this.
+*Red Alert: Pre-usable software ahead.*
 
-Additionally there is the problem of developer participation. A lot of
-javascript and CLR developers are not interested in learning another
-platform's ins-and-outs to contribute to a build tool.
+Note: Camp is kind of windows-centric right now, mostly because I
+haven't had time to investigate getting it to run under mono. Rest
+assured that mono+other-OS support is high on the priority list.
 
-## How to Install
-
-For now, get the source and
+Install via [chocolatey](https://chocolatey.org/) or get the source
+and compile yourself (see "How to Hack" below.)
 
 ```shell
-$ msbuild /t:CampExe
+$ choco install -pre camp.portable
 ```
 
-Put everything in the targets directory into your path somehow.
-
-## How to Use
+Once camp is installed,
 
 ```shell
 $ camp new foo
@@ -68,11 +55,17 @@ file at the root of your project:
                  [Microsoft.Net.Http "2.2.28"]])
 ```
 
-Now, if you use `camp deps` it will fetch them and refer to them when
-compiling your project:
+Note: the version specifier uses nuget's
+[version range notation](http://docs.nuget.org/Create/Versioning), so
+"1.6.0.1" actually means ">= 1.6.0.1". If you want to use exactly
+"1.6.0.1", you need to surround it in brackets, so the dependency
+spec would be like '[Clojure "[1.6.0.1]"]'.
+
+Use `camp deps` to fetch the dependencies.
 
 ```shell
 $ camp deps
+Installing [Clojure 1.6.0.1]
 Installing [NUnit 2.6.4]
 Installing [Microsoft.Net.Http 2.2.28]
 ```
@@ -94,6 +87,17 @@ d-----        2/21/2015  10:46 AM                NUnit.2.6.4
 
 Now, write some code. There will be one source file, `src\core.clj`
 which you can use as a starting point.
+
+To use an assembly from a dependency you have added, add something
+like:
+
+```clojure
+;;; Load with partial name
+(assembly-load "Microsoft.Net.Http")
+
+(ns my.ns
+  (:import [System.Net.Http HttpClient HttpResponseMessage]))
+```
 
 When you are ready:
 
@@ -121,6 +125,47 @@ This will cause the compiler to generate an exe called `foo.core.exe`
 in addition to a DLL for the `core` namespace and any other namespace
 you have.
 
+## How to Hack
+
+Get the source, make changes, and
+
+```shell
+$ msbuild /t:CampExe
+```
+
+If you have [Chocolatey](https://chocolatey.org/) installed on your
+system, you should be able to build and install the package, by saying
+
+```shell
+$ msbuild /t:ChocoInstall
+```
+
+Then `camp` will be in your path.
+
+Otherwise you can always run it from the targets directory
+
+```shell
+$ camp\targets\camp.exe new mycampproj
+```
+
+## What about Leiningen?
+
+Leiningen is a shining example of what a development tool should be
+like. Unfortunately, Leiningen is so good that it's being used outside
+of it's comfort zone. Leiningen is perfectly up to the task of
+building ClojureCLR applications, but to me, feels a little alien when
+used for non-JVM projects. It can't really take full advantage of the
+capabilities of other platforms. I think we can do better than to just
+try and make the same Leiningen do all this.
+
+Additionally there is the problem of developer participation. A lot of
+javascript and CLR developers are not interested in learning another
+platform's ins-and-outs to contribute to a build tool.
+
+Camp is not intended to be a "leiningen clone on the CLR", but I'd be
+nothing less than flattered if someone made the mistake of thinking
+that it was someday.
+
 ## Roadmap
 
 See Notes.org for detailed plans and othe notes, but real quick:
@@ -135,7 +180,9 @@ it.
 
 I don't think anything else about clojure-clr or the dependencies camp
 has would prevent it from running under mono, and I feel it's
-important that it does work on Mono.
+important that it does work on Mono. A medium-term goal would be to
+get ClojureCLR to work with Xamarin, so you could use it to build
+native iOS, Android, and OSX apps.
 
 ### What about other types of projects? Templates?
 
@@ -150,7 +197,9 @@ use NREPL CLR yet, but plan to very soon.
 ### Can I use «my editor»?
 
 I suppose, once NREPL support is done. But I pretty much just use
-emacs, so I'm afraid you're on your own.
+emacs, so I probably won't be doing any work on this. If you have to
+change something to get it to work with another editor, please send a
+pull request.
 
 ### Can I use Visual Studio?
 

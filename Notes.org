@@ -1,3 +1,9 @@
+#+TITLE: Notes About Camp
+#+AUTHOR: Chris Bilson
+#+EMAIL: cbilson@pobox.com
+#+OPTIONS: toc:3 num:nil
+#+STYLE: <link rel="stylesheet" type="text/css" href="http://thomasf.github.io/solarized-css/solarized-light.min.css" />
+
 * Features
   
 ** DONE new command                                                  :v0_1_0:
@@ -35,21 +41,28 @@
    $ camp compile
    #+END_SRC
    
-** TODO License :v_0_1_0:
+** DONE fix compile task to check deps				:v_0_1_0:bug:
+   CLOSED: [2015-02-21 Sat 11:31]
+   
+** WIP License							    :v_0_1_0:
    - Need to check with MSOT
      
-** WIP README.md						    :v_0_1_0:
+** DONE README.md						    :v_0_1_0:
+   CLOSED: [2015-02-27 Fri 08:25]
    - Give vision
    - Show example
    - Mention road map
 
-** BACKLOG Packaging
+** DONE Packaging
+   CLOSED: [2015-02-27 Fri 08:25]
    - nuget package
+     - update: I actually don't think this is necessary. Choco package
+       is needed anyway, and consists of a nuget package already.
    - chocolatey package
      - This is easy and will add a lot of value in not making people
        have to futz with their PATH.
 
-** BACKLOG Announce :v_0_1_0:
+** TODO Announce						    :v_0_1_0:
    - screen casts
    - clojure-clr google group
    - twitter
@@ -57,6 +70,12 @@
    - reddit
    - lobste.rs/hackernews, ...
      
+** BACKLOG Camp always compiles with clojure it was compiled with :bug:v_0_1_1:
+   - It's going to pick up the Clojure.dll in the camp.exe directory.
+   - Maybe switch to doing something like what the camp build script does,
+     where tools are copied into a working directory from deps, and use
+     the Clojure.Compiler.exe from deps?
+
 ** BACKLOG Tests for camp itself 				    :v_0_1_1:
    - Try different testing libs and see which one works.
    - Strategy: 0.1.0 is a spike. Need to think about maintenance from
@@ -96,9 +115,6 @@
    - lots of JVM projects depend on resources and I imagine CLR ones
      will too.
 
-** DONE fix compile task to check deps				:v_0_1_4:bug:
-   CLOSED: [2015-02-21 Sat 11:31]
-   
 ** BACKLOG run task
    - Is it even needed?
    - Should be pretty simple to get going.
@@ -113,8 +129,11 @@
 ** BACKLOG plug-ins
 
 ** BACKLOG compiling other languages
+   - C#, F#
+   - Similar to how leiningen compiles java
 
 ** BACKLOG profiles
+
 
 * Ideas
 
@@ -143,6 +162,7 @@
 
 ** eval-in-project
    - Leverage app domains to make it easier to eval-in-project
+
 
 * Notes
   
@@ -215,5 +235,6 @@
        on my TODO list to investigate this.
      - I'm not that interested in a plain-old REPL, I want to be able
        to use the REPL in emacs and eval forms while I am working.
+
 *** 2014-02-21
     I added build targets for testing, so "msbuild /verbosity:minimal /t:TestCompile", etc.
