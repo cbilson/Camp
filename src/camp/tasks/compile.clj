@@ -3,6 +3,7 @@
   (:require [clojure.string :as str]
             [camp.core :refer [getenv setenv verbose]]
             [camp.io :as io]
+            [camp.nuget :as nuget]
             [camp.tasks.deps :as deps]))
 
 (defn- source-file->target-ns
@@ -55,7 +56,7 @@
   "Make sure libs from all of the project's dependencies are in the
   targets directory."
   [{:keys [targets-path] :as proj}]
-  (doseq [source-file-name (deps/libs proj)]
+  (doseq [source-file-name (nuget/libs proj)]
     (let [file-name (io/file-name-only source-file-name)
           destination-file-name (io/file targets-path file-name)]
       (when (not (io/file-exists? destination-file-name))
