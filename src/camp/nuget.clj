@@ -9,6 +9,7 @@
             IPackage
             LocalPackageRepository
             PackageBuilder PackageExtensions PackageHelper
+            PackageExtensions PackageHelper
             PackageManager PackageRepositoryFactory
             PackageReference SemanticVersion
             VersionUtility]))
