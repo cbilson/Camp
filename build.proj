@@ -51,9 +51,12 @@
     <Sources Include="camp.main" />
     <Sources Include="camp.tasks.compile" />
     <Sources Include="camp.project" />
+    <Sources Include="camp.nuget" />
+    <Sources Include="camp.tasks.deploy" />
     <Sources Include="camp.tasks.deps" />
     <Sources Include="camp.tasks.help" />
     <Sources Include="camp.tasks.new" />
+    <Sources Include="camp.tasks.package" />
     <Sources Include="camp.tasks.pprint" />
   </ItemGroup>
 

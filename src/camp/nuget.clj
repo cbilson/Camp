@@ -8,7 +8,7 @@
             IFrameworkTargetable
             IPackage
             LocalPackageRepository
-            PackageExtensions PackageHelper
+            PackageBuilder PackageExtensions PackageHelper
             PackageManager PackageRepositoryFactory
             PackageReference SemanticVersion
             VersionUtility]))
@@ -110,3 +110,5 @@
   [pm [id ver]]
   (.InstallPackage pm (str id) (semver ver) false false))
 
+(defn pkg-builder []
+  (PackageBuilder.))
