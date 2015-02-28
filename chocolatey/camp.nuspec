@@ -19,7 +19,7 @@
       - Package and deploy to nuget.org.
     </description>
     <projectUrl>https://github.com/cbilson/camp</projectUrl>
-    <tags>camp admin</tags>
+    <tags>Clojure ClojureCLR camp tool</tags>
     <copyright>Chris Bilson, 2015</copyright>
     <licenseUrl>https://raw.githubusercontent.com/cbilson/camp/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
