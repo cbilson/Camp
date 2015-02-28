@@ -32,6 +32,7 @@
 (def project-defaults
   {:target-framework "net40"
    :nuget-repository "https://nuget.org/api/v2"
+   :deploy-repository "https://nuget.org/api/v2"
    :root (io/current-directory)
    :packages-path "packages"
    :source-paths ["src"]
