@@ -44,8 +44,8 @@
 ** DONE fix compile task to check deps				:v_0_1_0:bug:
    CLOSED: [2015-02-21 Sat 11:31]
    
-** WIP License							    :v_0_1_0:
-   - Need to check with MSOT
+** BLOCKED License						    :v_0_1_0:
+   - Waiting on LCA
      
 ** DONE README.md						    :v_0_1_0:
    CLOSED: [2015-02-27 Fri 08:25]
@@ -61,6 +61,12 @@
    - chocolatey package
      - This is easy and will add a lot of value in not making people
        have to futz with their PATH.
+
+** TODO deploy task  :v_0_1_0:
+   - I want this now, since tools.nrepl has no nuget package yet
+   - Must handle project names like org.clojure.clr/tools.nrepl
+     - maybe this should be called org.coljure.clr.tools.nrepl?
+     - See [[Deploy%20Task%20Package%20Naming][Deploy Task Package Naming]]
 
 ** TODO Announce						    :v_0_1_0:
    - screen casts
@@ -133,6 +139,15 @@
    - Similar to how leiningen compiles java
 
 ** BACKLOG profiles
+
+** BACKLOG Support multiple nuget repositories  
+   - For people that have private repos
+   - So project :nuget-repository would be a vector or something
+
+** BACKLOG Crisp-ness around schema of project.clj
+   - What are legal project names anyway
+   - Right now I avoid "-" "_" in test project names because I don't
+     know what will happen :-(.
 
 
 * Ideas
@@ -238,3 +253,12 @@
 
 *** 2014-02-21
     I added build targets for testing, so "msbuild /verbosity:minimal /t:TestCompile", etc.
+** Deploy Task Package Naming
+   - [[http://docs.nuget.org/Create/Package-Conventions][NuGet Guidance on Package Id Conventions]]
+     - Like .NET namespaces
+     - Don't use dashes, use dots instead
+   - Maybe camp itself could turn slashes in dependency specs into dots? 
+     - This would look more like clojure
+   - Not finding much else in the way of guidance or specification of
+     legal package ids.
+
