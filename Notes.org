@@ -179,6 +179,21 @@
    - Leverage app domains to make it easier to eval-in-project
 
 
+** Use other tools as exes or libs
+   Camp needs to use other tools, like the clojure compiler, nuget,
+   etc. Is it better to use those other tools as executables, as a rule,
+   or use as a library when available?
+
+   For example, to restore dependencies, camp *could* generate a packages.config
+   file and shell out to nuget.exe to restore them.
+
+   Instead, at this point, I have taken the 
+
+*** Factors in favor of shelling out to other tools
+    - 
+
+*** Factors in favor of using libraries
+
 * Notes
   
 ** Clojure Compiler
@@ -261,4 +276,24 @@
      - This would look more like clojure
    - Not finding much else in the way of guidance or specification of
      legal package ids.
+
+** NuGet Packaging
+   - IncludeReferencedProjects option to nuget pack
+   - Configuration option to nuget pack
+     - Seems related to profiles
+   - tools files
+     - Might make sense to support designating some files as tools
+     - tools is how chocolatey works, so maybe this would be a nice way
+       to unify application and library packaging.
+   - content
+     - Gets copied to root of application, so need to support paths.
+     - Coming around to the idea that this is where most of the things packaged
+       into jars as resources on JVM clojure belong.
+       - Of course there are other kinds of resources, like the ones that belong
+	 in .NET assembly resources.
+       - Deploying web applications this way makes a lot of sense.
+   - 
+
+*** Sources
+    - [[http://docs.nuget.org/create/Creating-and-Publishing-a-Package]["Creating and Publishing a Package", docs.nuget.org]]
 
