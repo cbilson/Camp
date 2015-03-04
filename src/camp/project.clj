@@ -30,7 +30,10 @@
   (walk/walk unquote-step identity args))
 
 (def project-defaults
-  {:target-framework "net40"
+  {:name ""
+   :version "0.1.0-SNAPSHOT"
+   :safe-name ""
+   :target-framework "net40"
    :nuget-repository "https://nuget.org/api/v2"
    :deploy-repository "https://nuget.org/api/v2"
    :root (io/current-directory)

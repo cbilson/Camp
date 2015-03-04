@@ -1,53 +1,23 @@
-;; -*- compilation-command: "msbuild /t:CampExe /verbosity:minimal"
 (ns camp.tasks.new
-  (:require [clojure.clr.io :as io]
-            [camp.core :refer [getenv]]
-            [camp.io :as cio]))
+  "Create new projects."
+  (:require [camp.io :as cio]
+            [camp.project :as cp]
+            [camp.templates :as templates]))
 
-(defn gitignore []
-  (println "/targets")
-  (println "/checkouts")
-  (println "/packages")
-  (println "*.dll")
-  (println "/src/**/*.exe")
-  (println "/.nrepl-port")
-  (println "/.repl")
-  (println "/out")
-  (println "")
-  (println "# ignore emacs temp files")
-  (println "\\#*"))
-
-(defn project-clj [name]
-  (println  "(defproject" name "\"0.1.0-SNAPSHOT\"")
-  (println  "  :description \"TODO: describe\"")
-  (println  "  :license {:name \"BSD\"")
-  (println  "            :url \"http://www.opensource.org/licenses/BSD-3-Clause\"")
-  (println  "            :distribution :repo}")
-  (println  "  :dependencies [[Clojure \"1.6.0.1\"]])"))
-
-(defn core-clj [name]
-  (println "(ns"(str name ".core"))
-  (println "  (:gen-class))")
-  (println "")
-  (println "(defn -main [& args]")
-  (println "  (println \"TODO: something\"))"))
-
-(defn write-template [fname template-fn & args]
-  (with-open [writer (io/text-writer fname)]
-    (binding [*out* writer]
-      (apply template-fn args))))
-
-#_(defn -dump-template [fname template-fn & args]
-  (apply template-fn args))
+(defn resolve-template-fn
+  "Templates will be functions in the camp.project-templates namespace."
+  [name]
+  (let [ns (str "camp.project-template")
+        ns-sym (symbol ns)
+        sym (symbol ns name)]
+    (when-not (find-ns ns-sym)
+      (require ns-sym))
+    (resolve sym)))
 
 (defn new
   "Create a new ClojureCLR project from a template."
-  [project name & rest]
-  (cio/mkdir name)
-  (write-template (cio/file name "project.clj") project-clj name)
-  (write-template (cio/file name ".gitignore") gitignore)
-  (cio/mkdir (cio/file name "src"))
-  (cio/mkdir (cio/file name "src" name))
-  (write-template (cio/file name "src" name "core.clj") core-clj name)
-  (println "Created a new ClojureCLR camp project named" name
-           "in the directory" name))
+  [_ name & [project-template & rest]]
+  (let [safe-name (.Replace name "-" "_")
+        new-project (assoc cp/project-defaults :name name :safe-name safe-name)
+        project-fn (resolve-template-fn (or project-template "default"))]
+    (apply project-fn new-project rest)))

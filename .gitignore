@@ -4,8 +4,9 @@
 /tools/Microsoft*
 /src/**/*.dll
 /src/**/*.exe
-/scratch-project/
-\#*#
-/tstproj/
 *.nupkg
 /tools/NuGet.Core.dll
+/tools/System.Web.Razor.dll
+/tools/Westwind.RazorHosting.dll
+/tools/camp.resources.dll
+/test_project/
