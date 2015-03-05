@@ -40,11 +40,6 @@
   (println "(defn -main [& args]")
   (println "  (println \"TODO: something\"))"))
 
-(defn write-template [fname template-fn & args]
-  (with-open [writer (io/text-writer fname)]
-    (binding [*out* writer]
-      (apply template-fn args))))
-
 #_(defn -dump-template [fname template-fn & args]
     (apply template-fn args))
 
@@ -59,12 +54,18 @@
                 reader (System.IO.StreamReader. stream)
                 writer (System.IO.StringWriter.)]
       (.RenderTemplate engine reader project writer)
+      (println (.ErrorMessage engine))
       (.ToString writer))))
+
+(defn write-template [fname template-fn & args]
+  (with-open [writer (io/text-writer fname)]
+    (binding [*out* writer]
+      (apply template-fn args))))
 
 (defn new
   "Create a new ClojureCLR project from a template."
   [project name & rest]
-  (prn (eval-template project "gitignore"))
+  (prn (eval-template project "project"))
   (cio/mkdir name)
   (write-template (cio/file name "project.clj") project-clj name)
   (write-template (cio/file name ".gitignore") gitignore)
