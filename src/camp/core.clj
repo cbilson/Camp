@@ -42,3 +42,8 @@
 
 (defn error [{error? :error?} & messages]
   (print-when error? messages))
+
+(defn to-dictionary [m]
+  (let [d (|System.Collections.Generic.Dictionary`2[System.String,System.String]|.)]
+    (doseq [k (keys m)]
+      (.Add d (str k) (str (m k))))))

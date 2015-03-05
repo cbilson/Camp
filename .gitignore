@@ -9,3 +9,7 @@
 /tstproj/
 *.nupkg
 /tools/NuGet.Core.dll
+/camp.resources.dll
+/tools/System.Web.Razor.dll
+/tools/Westwind.RazorHosting.dll
+/tools/camp.resources.dll

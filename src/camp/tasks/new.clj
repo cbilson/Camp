@@ -1,8 +1,16 @@
-;; -*- compilation-command: "msbuild /t:CampExe /verbosity:minimal"
+(assembly-load "Westwind.RazorHosting")
+
 (ns camp.tasks.new
   (:require [clojure.clr.io :as io]
-            [camp.core :refer [getenv]]
-            [camp.io :as cio]))
+            [camp.core :refer [getenv to-dictionary]]
+            [camp.io :as cio])
+  (:import [Westwind.RazorHosting RazorEngine]))
+
+(defn razor-engine []
+  (RazorEngine.))
+
+(defn render-template [project engine template]
+  (.RenderTemplate engine template project))
 
 (defn gitignore []
   (println "/targets")
@@ -38,11 +46,25 @@
       (apply template-fn args))))
 
 #_(defn -dump-template [fname template-fn & args]
-  (apply template-fn args))
+    (apply template-fn args))
+
+(defn camp-resource [name]
+  )
+
+(defn eval-template [project name]
+  (let [asm (assembly-load "camp.resources")
+        engine (razor-engine)
+        resource-name (str "templates." name)]
+    (with-open [stream (.GetManifestResourceStream asm resource-name)
+                reader (System.IO.StreamReader. stream)
+                writer (System.IO.StringWriter.)]
+      (.RenderTemplate engine reader project writer)
+      (.ToString writer))))
 
 (defn new
   "Create a new ClojureCLR project from a template."
   [project name & rest]
+  (prn (eval-template project "gitignore"))
   (cio/mkdir name)
   (write-template (cio/file name "project.clj") project-clj name)
   (write-template (cio/file name ".gitignore") gitignore)
