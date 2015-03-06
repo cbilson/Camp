@@ -40,20 +40,18 @@
   (println "(defn -main [& args]")
   (println "  (println \"TODO: something\"))"))
 
-#_(defn -dump-template [fname template-fn & args]
-    (apply template-fn args))
-
-(defn camp-resource [name]
-  )
+(defn prj->Model [project]
+  (reduce (fn [m k] (assoc m (name k)(project k))) {} (keys project) ))
 
 (defn eval-template [project name]
   (let [asm (assembly-load "camp.resources")
         engine (razor-engine)
-        resource-name (str "templates." name)]
+        resource-name (str "templates." name)
+        model (prj->Model project)]
     (with-open [stream (.GetManifestResourceStream asm resource-name)
                 reader (System.IO.StreamReader. stream)
                 writer (System.IO.StringWriter.)]
-      (.RenderTemplate engine reader project writer)
+      (.RenderTemplate engine reader model writer)
       (println (.ErrorMessage engine))
       (.ToString writer))))
 
@@ -65,12 +63,9 @@
 (defn new
   "Create a new ClojureCLR project from a template."
   [project name & rest]
-  (prn (eval-template project "project"))
-  (cio/mkdir name)
-  (write-template (cio/file name "project.clj") project-clj name)
-  (write-template (cio/file name ".gitignore") gitignore)
-  (cio/mkdir (cio/file name "src"))
-  (cio/mkdir (cio/file name "src" name))
-  (write-template (cio/file name "src" name "core.clj") core-clj name)
-  (println "Created a new ClojureCLR camp project named" name
-           "in the directory" name))
+  (let [new-project (assoc project :name name)]
+    (cio/mkdir name)
+    (println (eval-template new-project "project"))
+    (write-template (cio/file name "src" name "core.clj") core-clj name)
+    (println "Created a new ClojureCLR camp project named" name
+             "in the directory" name)))
