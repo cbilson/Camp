@@ -25,17 +25,17 @@
   <PropertyGroup>
     <Version>0.1.0.0</Version>
     <ProductVersion>0.1.0-SNAPSHOT</ProductVersion>
-    <OutDir>$(MSBuildThisFileDirectory)bin\</OutDir>
+    <OutDir>bin\</OutDir>
     <Configuration>Debug</Configuration>
-    <SourceDir>$(MSBuildThisFileDirectory)src</SourceDir>
-    <ToolsDir>$(MSBuildThisFileDirectory)tools\</ToolsDir>
-    <ClojureCompiler>$(MSBuildThisFileDirectory)tools\Clojure.Compile.exe</ClojureCompiler>
-    <PackagesDir>$(MSBuildThisFileDirectory)packages</PackagesDir>
-    <ClojurePackageDir>$(PackagesDir)\Clojure.1.6.0.1\</ClojurePackageDir>
-    <ExtensionTasksPath>$(PackagesDir)\MSBuild.Extension.Pack.1.5.0\tools\net40</ExtensionTasksPath>
-    <TargetsDir>$(MSBuildThisFileDirectory)targets</TargetsDir>
+    <SourceDir>src\</SourceDir>
+    <ToolsDir>tools\</ToolsDir>
+    <ClojureCompiler>$(ToolsDir)Clojure.Compile.exe</ClojureCompiler>
+    <PackagesDir>packages\</PackagesDir>
+    <ClojurePackageDir>$(PackagesDir)Clojure.1.6.0.1\</ClojurePackageDir>
+    <TargetsDir>targets\</TargetsDir>
     <TestProjectName>tstproj</TestProjectName>
-    <ChocoExe>$(MSBuildThisFileDirectory)\packages\chocolatey.0.9.9-rc8\tools\chocolateyInstall\choco.exe</ChocoExe>
+    <ChocoExe>$(PackagesDir)chocolatey.0.9.9-rc8\tools\chocolateyInstall\choco.exe</ChocoExe>
+    <ClojureCompilePath>$([System.IO.Path]::GetFullPath($(TargetsDir)))</ClojureCompilePath>
   </PropertyGroup>
 
   <ItemGroup>
@@ -44,24 +44,13 @@
 
   <ItemGroup>
     <Libs Include="$(ClojurePackageDir)lib\net40\*.dll" />
-    <Libs Include="$(PackagesDir)\Nuget.Core.2.8.3\lib\net40-Client\NuGet.Core.dll" />
-    <Libs Include="$(PackagesDir)\Westwind.RazorHosting.3.00\lib\net40\Westwind.RazorHosting.dll" />
-    <Libs Include="$(PackagesDir)\Microsoft.AspNet.Razor.3.2.3\lib\net45\*.dll" />
+    <Libs Include="$(PackagesDir)Nuget.Core.2.8.3\lib\net40-Client\NuGet.Core.dll" />
+    <Libs Include="$(PackagesDir)Westwind.RazorHosting.3.00\lib\net40\Westwind.RazorHosting.dll" />
+    <Libs Include="$(PackagesDir)Microsoft.AspNet.Razor.3.2.3\lib\net45\*.dll" />
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Clojure.Compile wants the source namespace names, not files -->
-    <Sources Include="camp.core" />
-    <Sources Include="camp.main" />
-    <Sources Include="camp.tasks.compile" />
-    <Sources Include="camp.project" />
-    <Sources Include="camp.nuget" />
-    <Sources Include="camp.tasks.deploy" />
-    <Sources Include="camp.tasks.deps" />
-    <Sources Include="camp.tasks.help" />
-    <Sources Include="camp.tasks.new" />
-    <Sources Include="camp.tasks.package" />
-    <Sources Include="camp.tasks.pprint" />
+    <Sources Include="$(SourceDir)**/*.clj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -73,7 +62,7 @@
     </Resources>
   </ItemGroup>
 
-  <Target Name="Build" DependsOnTargets="RestorePackages;Init;CampExe" />
+  <Target Name="Build" DependsOnTargets="RestorePackages;Init;Compile;PostCompile" />
 
   <Target Name="RestorePackages">
     <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
@@ -81,8 +70,10 @@
 
   <Target Name="Init" DependsOnTargets="InitToolsDir;InitTargetsDir" />
 
-  <Target Name="CampExe" DependsOnTargets="Compile">
-    <!-- <Copy SourceFiles="@(ClojureCompilerOutput)" DestinationFolder="$(TargetsDir)" /> -->
+  <Target Name="Compile" DependsOnTargets="CompileResources;CompileClojure"
+          Outputs="$(TargetsDir)camp.exe">
+    <Copy SourceFiles="$(TargetsDir)camp.main.exe"
+          DestinationFiles="$(TargetsDir)camp.exe" />
   </Target>
 
   <Target Name="InitToolsDir">
@@ -105,46 +96,47 @@
           SkipUnchangedFiles="true" />
   </Target>
 
-  <Target Name="Compile" DependsOnTargets="CompileResources;CompileClojure" />
-  
-  <Target Name="CompileResources">
+  <Target Name="CompileResources"
+          Inputs="@(Resources)"
+          Outputs="$(ToolsDir)camp.resources.dll">
     <AL EmbedResources="@(Resources)"
-	Description="Resources used by camp"
-	Title="camp resources"
-	ProductName="camp"
-	ProductVersion="$(Version)"
-	Version="$(Version)"
-	OutputAssembly="$(TargetsDir)\camp.resources.dll" />
-    <Copy SourceFiles="$(TargetsDir)\camp.resources.dll"
-	  DestinationFolder="$(ToolsDir)" />
+        Description="Resources used by camp"
+        Title="camp resources"
+        ProductName="camp"
+        ProductVersion="$(Version)"
+        Version="$(Version)"
+        OutputAssembly="$(TargetsDir)camp.resources.dll" />
+    <Copy SourceFiles="$(TargetsDir)camp.resources.dll"
+          DestinationFolder="$(ToolsDir)" />
   </Target>
 
-  <Target Name="CompileClojure">
+  <Target Name="CompileClojure"
+          Inputs="@(Sources)"
+          Outputs="@(Sources->'$(TargetsDir)%(Identity).dll'->Replace('src\', '')->Replace('camp\', 'camp.')->Replace('tasks\', 'tasks.'))">
     <!-- have compiler output go straight into targets path -->
-    <SetEnvironmentVariable Name="CLOJURE_COMPILE_PATH" Value="$(TargetsDir)" />
-    <Exec Command="$(ClojureCompiler) @(Sources, ' ')"
+    <Message Text="CLOJURE_COMPILE_PATH = $(ClojureCompilePath)" />
+    <SetEnvironmentVariable Name="CLOJURE_COMPILE_PATH" Value="$(ClojureCompilePath)" />
+    <Exec Command="..\$(ClojureCompiler) @(Sources->Replace('src\', '')->Replace('.clj', '')->Replace('\', '.'), ' ')"
           WorkingDirectory="$(SourceDir)" />
-    <Move SourceFiles="$(TargetsDir)\camp.main.exe"
-          DestinationFiles="$(TargetsDir)\camp.exe" />
   </Target>
 
-  <Target Name="TestNew" DependsOnTargets="CampExe">
+  <Target Name="TestNew" DependsOnTargets="Compile">
     <Delete Files="$(TestProjectName)" />
-    <Exec Command="targets\camp.exe new $(TestProjectName)"
+    <Exec Command="$(TargetsDir)camp.exe new $(TestProjectName)"
           WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
 
-  <Target Name="TestDeps" DependsOnTargets="CampExe">
-    <Exec Command="..\targets\camp.exe deps"
-          WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
+  <Target Name="TestDeps" DependsOnTargets="Compile">
+    <Exec Command="$(TargetsDir)camp.exe deps"
+          WorkingDirectory="$(MSBuildThisFileDirectory)$(TestProjectName)" />
   </Target>
 
-  <Target Name="TestCompile" DependsOnTargets="CampExe">
-    <Exec Command="..\targets\camp.exe compile"
-          WorkingDirectory="$(MSBuildThisFileDirectory)\$(TestProjectName)" />
+  <Target Name="TestCompile" DependsOnTargets="Compile">
+    <Exec Command="$(TargetsDir)camp.exe compile"
+          WorkingDirectory="$(MSBuildThisFileDirectory)$(TestProjectName)" />
   </Target>
 
-  <Target Name="TestRunTarget" DependsOnTargets="CampExe">
+  <Target Name="TestRunTarget" DependsOnTargets="Compile">
     <Message Text="Target output:" Importance="high" />
     <Message Text="----------------------------------------" Importance="high" />
     <Exec Command="$(TestProjectName).core.exe"
@@ -154,7 +146,7 @@
 
   <Target Name="Package" DependsOnTargets="ChocolateyPackage" />
 
-  <Target Name="ChocolateyPackage" DependsOnTargets="CampExe">
+  <Target Name="ChocolateyPackage" DependsOnTargets="Compile">
     <Exec Command="$(ChocoExe) pack chocolatey\camp.nuspec" />
   </Target>
 
@@ -163,8 +155,13 @@
   </Target>
 
   <Target Name="Clean">
-    <!-- TODO: Rest of binaries -->
-    <Delete Files="chocolatey\camp*.nupkg" />
+    <ItemGroup>
+      <Garbage Include="chocolatey\*.nupkg" />
+      <Garbage Include="$(TargetsDir)*" />
+      <Garbage Include="$(ToolsDir)*" Exclude="$(ToolsDir)nuget.exe" />
+    </ItemGroup>
+
+    <Delete Files="@(Garbage)" />
   </Target>
 
 </Project>
