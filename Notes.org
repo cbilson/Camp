@@ -8,46 +8,47 @@
   
 ** DONE new command                                                  :v0_1_0:
    CLOSED: [2015-02-18 Wed 08:36]
-   
+
    #+BEGIN_SRC shell
    $ camp new myapp
    #+END_SRC
-   
+
    This should:
    - create a new directory
    - add a .gitignore
    - add a project.clj
      - includes lein-esque deps
    - add src/myapp/core.clj
-     
+
 ** DONE deps command                                               :v1_0_1_0:
    CLOSED: [2015-02-18 Wed 08:36]
    - fetch deps from nuget
    - be able to gather all target framework compatible libs, content,
      and tools.
-     
+
    #+BEGIN_SRC shell
    $ camp deps
    #+END_SRC
-   
-** DONE compile command						    :v_0_1_0:
+
+** DONE compile command                                             :v_0_1_0:
    CLOSED: [2015-02-21 Sat 08:54]
    - fetch deps in not already there
      - Oops, forgot about this part. I'll get to it later.
    - construct a Clojure.Compiler command line
    - output goes in targets dir
-     
+
    #+BEGIN_SRC shell
    $ camp compile
    #+END_SRC
-   
-** DONE fix compile task to check deps				:v_0_1_0:bug:
+
+** DONE fix compile task to check deps                          :v_0_1_0:bug:
    CLOSED: [2015-02-21 Sat 11:31]
    
 ** BLOCKED License						    :v_0_1_0:
    - Waiting on LCA
      
-** DONE README.md						    :v_0_1_0:
+** DONE License                                                     :v_0_1_0:
+** DONE README.md                                                   :v_0_1_0:
    CLOSED: [2015-02-27 Fri 08:25]
    - Give vision
    - Show example
@@ -62,27 +63,33 @@
      - This is easy and will add a lot of value in not making people
        have to futz with their PATH.
 
+** BACKLOG templates                                                 :v_0_1_0:
+   - I like the way leiningen templates work. Something like that...
+
 ** TODO deploy task  :v_0_1_0:
    - I want this now, since tools.nrepl has no nuget package yet
    - Must handle project names like org.clojure.clr/tools.nrepl
      - maybe this should be called org.coljure.clr.tools.nrepl?
      - See [[Deploy%20Task%20Package%20Naming][Deploy Task Package Naming]]
 
-** TODO Announce						    :v_0_1_0:
+** TODO icon for camp.exe :v_0_1_0:
+   - Make chocolatey stop complaining about missing icon.
+     
+** TODO Announce                                                    :v_0_1_0:
    - screen casts
    - clojure-clr google group
    - twitter
    - seajure
    - reddit
    - lobste.rs/hackernews, ...
-     
+
 ** BACKLOG Camp always compiles with clojure it was compiled with :bug:v_0_1_1:
    - It's going to pick up the Clojure.dll in the camp.exe directory.
    - Maybe switch to doing something like what the camp build script does,
      where tools are copied into a working directory from deps, and use
      the Clojure.Compiler.exe from deps?
 
-** BACKLOG Tests for camp itself 				    :v_0_1_1:
+** BACKLOG Tests for camp itself                                    :v_0_1_1:
    - Try different testing libs and see which one works.
    - Strategy: 0.1.0 is a spike. Need to think about maintenance from
      0.1.1 on wards.
@@ -93,9 +100,6 @@
 
 ** BACKLOG nrepl                                                     :v_0_1_2:
    - read somewhere that it "almost works"
-
-** BACKLOG templates                                                 :v_0_1_3:
-   - I like the way leiningen templates work. Something like that...
 
 ** BACKLOG test task :v_0_1_3:
    - based on experience with lein test and whatever I learn doing
@@ -114,7 +118,7 @@
      a patch.
    - But then I'm dependent on a future release of ClojureCLR nuget
      package.
-     
+
 ** BACKLOG resources                                                 :v_0_1_4:
    Need a way to embed resources in assemblies.
    - resource compiler
@@ -140,7 +144,7 @@
 
 ** BACKLOG profiles
 
-** BACKLOG Support multiple nuget repositories  
+** BACKLOG Support multiple nuget repositories
    - For people that have private repos
    - So project :nuget-repository would be a vector or something
 
@@ -148,8 +152,7 @@
    - What are legal project names anyway
    - Right now I avoid "-" "_" in test project names because I don't
      know what will happen :-(.
-
-
+     
 * Ideas
 
 ** Camping Metaphor
@@ -174,10 +177,8 @@
 
 *** Camping is just fun
 
-
 ** eval-in-project
    - Leverage app domains to make it easier to eval-in-project
-
 
 ** Use other tools as exes or libs
    Camp needs to use other tools, like the clojure compiler, nuget,
@@ -187,23 +188,16 @@
    For example, to restore dependencies, camp *could* generate a packages.config
    file and shell out to nuget.exe to restore them.
 
-   Instead, at this point, I have taken the 
-
-*** Factors in favor of shelling out to other tools
-    - 
-
-*** Factors in favor of using libraries
-
 * Notes
-  
+
 ** Clojure Compiler
-   
+
    - [[http://clojureclr.blogspot.com/2012/01/compiling-and-loading-in-clojureclr.html][Compiling and loading in ClojureCLR]]
    - `clojure.core/compile' calls /load, then eventually,
      `clojure.lang.RT/load'.
      - clojure.core/compile also binds *compile-files* true.
    - If the .clj file is newer than the .clj.dll, it compiles the source file.
-   - It looks at `Compiler.CompileFilesVar.' to determine if it wants to 
+   - It looks at `Compiler.CompileFilesVar.' to determine if it wants to
      Compile or LoadScript.
    - The clojure symbol for CompileFilesVar is
      `clojure.core/*compile-files*' and it defaults to false.
@@ -237,7 +231,7 @@
 
    - In emacs, with projectile, clojure-mode
    - I have my compile command set to something like:
-     
+
      #+BEGIN_SRC shell
      msbuild /t:CampExe /verbosity:minimal && targets\camp.main.exe ...
      #+END_SRC
@@ -268,11 +262,12 @@
 
 *** 2014-02-21
     I added build targets for testing, so "msbuild /verbosity:minimal /t:TestCompile", etc.
+
 ** Deploy Task Package Naming
    - [[http://docs.nuget.org/Create/Package-Conventions][NuGet Guidance on Package Id Conventions]]
      - Like .NET namespaces
      - Don't use dashes, use dots instead
-   - Maybe camp itself could turn slashes in dependency specs into dots? 
+   - Maybe camp itself could turn slashes in dependency specs into dots?
      - This would look more like clojure
    - Not finding much else in the way of guidance or specification of
      legal package ids.
@@ -292,8 +287,6 @@
        - Of course there are other kinds of resources, like the ones that belong
 	 in .NET assembly resources.
        - Deploying web applications this way makes a lot of sense.
-   - 
 
 *** Sources
     - [[http://docs.nuget.org/create/Creating-and-Publishing-a-Package]["Creating and Publishing a Package", docs.nuget.org]]
-
