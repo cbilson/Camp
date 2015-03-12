@@ -2,8 +2,10 @@
 
 (ns camp.tasks.new
   (:require [clojure.clr.io :as io]
-            [camp.core :refer [getenv to-dictionary]]
-            [camp.io :as cio])
+            [clojure.string :as str]
+            [camp.core :refer [getenv to-dictionary error verbose]]
+            [camp.io :as cio]
+            [camp.project :as cp])
   (:import [Westwind.RazorHosting RazorEngine]))
 
 (defn razor-engine []
@@ -12,60 +14,80 @@
 (defn render-template [project engine template]
   (.RenderTemplate engine template project))
 
-(defn gitignore []
-  (println "/targets")
-  (println "/checkouts")
-  (println "/packages")
-  (println "*.dll")
-  (println "/src/**/*.exe")
-  (println "/.nrepl-port")
-  (println "/.repl")
-  (println "/out")
-  (println "")
-  (println "# ignore emacs temp files")
-  (println "\\#*"))
+(defn ->dynamic
+  "Attempt to make a dynamic object for model.
+  ***DOESN'T WORK***
+  When the razor template tries to use properties on this dynamic object,
+  I get a NotImplementedException."
+  [val]
+  (cond
+    (map? val)
+    (let [obj (System.Dynamic.ExpandoObject.)
+          obj-dict (cast |System.Collections.Generic.IDictionary`2[System.String, System.Object]| obj)]
+      (println "typeof obj-dict:" (class obj-dict))
+      (doseq [key (keys val)
+              :let [prop-name (-> key name (str/replace "-" "_"))]]
+        (println "Prop Name:" (pr-str prop-name))
+        (let [prop-val (->dynamic (val key))]
+          (println "Prop Val:" (pr-str prop-val))
+          (.Add obj-dict prop-name prop-val)))
+      obj)
 
-(defn project-clj [name]
-  (println  "(defproject" name "\"0.1.0-SNAPSHOT\"")
-  (println  "  :description \"TODO: describe\"")
-  (println  "  :license {:name \"BSD\"")
-  (println  "            :url \"http://www.opensource.org/licenses/BSD-3-Clause\"")
-  (println  "            :distribution :repo}")
-  (println  "  :dependencies [[Clojure \"1.6.0.1\"]])"))
+    (coll? val)
+    (let [coll (System.Collections.ArrayList.)]
+      (doseq [item val]
+        (.Add coll (->dynamic item)))
+      coll)
 
-(defn core-clj [name]
-  (println "(ns"(str name ".core"))
-  (println "  (:gen-class))")
-  (println "")
-  (println "(defn -main [& args]")
-  (println "  (println \"TODO: something\"))"))
+    (keyword? val)
+    (name val)
 
-(defn prj->Model [project]
+    :otherwise
+    val))
+
+(defn project->model
+  "Until I can get ->dynamic to work correctly, templates will use a simple
+  dictionary model, which they can access like: @Model[\"name\"]."
+  [project]
   (reduce (fn [m k] (assoc m (name k)(project k))) {} (keys project) ))
 
-(defn eval-template [project name]
+(defn eval-template
+  "Evaluate a template in the context of a project, returning the resulting
+   string."
+  [project name]
   (let [asm (assembly-load "camp.resources")
         engine (razor-engine)
         resource-name (str "templates." name)
-        model (prj->Model project)]
+        model (project->model project)]
     (with-open [stream (.GetManifestResourceStream asm resource-name)
                 reader (System.IO.StreamReader. stream)
                 writer (System.IO.StringWriter.)]
       (.RenderTemplate engine reader model writer)
-      (println (.ErrorMessage engine))
-      (.ToString writer))))
+      (let [error-message (.ErrorMessage engine)]
+        (when (not (System.String/IsNullOrWhiteSpace error-message)))
+        (error error-message))
+      (let [result (.ToString writer)]
+        (verbose result)
+        result))))
 
-(defn write-template [fname template-fn & args]
+(defn write-template
+  "Eval a template and write the result out to a file."
+  [project template-name fname]
   (with-open [writer (io/text-writer fname)]
-    (binding [*out* writer]
-      (apply template-fn args))))
+    (->> (eval-template project template-name)
+         (.Write writer))))
 
 (defn new
   "Create a new ClojureCLR project from a template."
-  [project name & rest]
-  (let [new-project (assoc project :name name)]
-    (cio/mkdir name)
-    (println (eval-template new-project "project"))
-    (write-template (cio/file name "src" name "core.clj") core-clj name)
+  [_ name & rest]
+  (let [safe-name (.Replace name "-" "_")
+        new-project (assoc cp/project-defaults :name name :safe-name safe-name)]
+    (cio/mkdir safe-name)
+    (write-template new-project "project" (cio/file safe-name "project.clj"))
+    (write-template new-project "gitignore" (cio/file safe-name ".gitignore"))
+    (cio/mkdir (cio/file safe-name "src"))
+    (cio/mkdir (cio/file safe-name "src" safe-name))
+    (write-template new-project "core.clj"
+                    (cio/file safe-name "src" safe-name "core.clj"))
     (println "Created a new ClojureCLR camp project named" name
-             "in the directory" name)))
+             "in the directory" safe-name)))

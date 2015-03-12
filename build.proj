@@ -60,6 +60,9 @@
     <Resources Include="resources\templates\project.razor">
       <LogicalName>templates.project</LogicalName>
     </Resources>
+    <Resources Include="resources\templates\core.clj.razor">
+      <LogicalName>templates.core.clj</LogicalName>
+    </Resources>
   </ItemGroup>
 
   <Target Name="Build" DependsOnTargets="RestorePackages;Init;Compile;PostCompile" />
