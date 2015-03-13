@@ -2,7 +2,8 @@
 
 (ns camp.nuget
   "Functions for working with nuget."
-  (:require [camp.io :as io])
+  (:require [camp.core :refer [verbose]]
+            [camp.io :as io])
   (:import [System.Runtime.Versioning FrameworkName]
            [NuGet
             IFrameworkTargetable
@@ -48,6 +49,7 @@
 
 (defn target-framework?
   [proj ^IFrameworkTargetable ft]
+  (verbose "Supported frameworks:" (.SupportedFrameworks ft))
   (some (partial = (framework proj)) (.SupportedFrameworks ft)))
 
 (defn full-name
@@ -75,31 +77,42 @@
     (map (partial io/file (:packages-path proj))
          (.GetPackageLookupPaths repo (str id) (semver ver)))))
 
-(defn compatible-files
-  ([proj selector]
-   (mapcat (partial compatible-files proj selector) (:dependencies proj)))
-  ([{packages-path :packages-path :as proj} selector dep]
+(defn- compatible-items
+  "Gets the full path to IFrameorkTargetable items in the packages
+  directory that are compatible with the project's framework."
+  ([proj type]
+   (mapcat (partial compatible-items proj type) (:dependencies proj)))
+   
+  ([{packages-path :packages-path :as proj} type dep]
    (let [pm (package-mgr proj)
-         pkg (find-package pm dep)]
-     (->> pkg
-          selector
-          (filter (partial target-framework? proj))
-          (map (partial io/file packages-path (full-name pkg)))))))
+         selector (type {:libs #(PackageExtensions/GetLibFiles %)
+                         :tools #(PackageExtensions/GetToolFiles %)
+                         :content #(PackageExtensions/GetContentFiles %)})
+         pkg (find-package pm dep)
+         items (selector pkg)
+         compatible-items nil]
+     (if (VersionUtility/TryGetCompatibleItems
+      (type-args NuGet.IPackageFile)
+      (framework proj)
+      (selector pkg)
+      (by-ref compatible-items))
+       (map (partial io/file packages-path (full-name pkg)) compatible-items)
+       (verbose "No compatible" (name type) "in" (full-name pkg))))))
 
 (defn libs
   "Get the libs from all the dependencies in the project."
   ([proj]
-   (compatible-files proj #(PackageExtensions/GetLibFiles %))))
+   (compatible-items proj :libs)))
 
 (defn tools
   "Get the tools from all the dependencies in the project."
   ([proj]
-   (compatible-files proj #(PackageExtensions/GetToolFiles %))))
+   (compatible-items proj :tools)))
 
 (defn content
   "Get the content from all the dependencies in the project."
   ([proj]
-   (compatible-files proj #(PackageExtensions/GetContentFiles %))))
+   (compatible-items proj :content)))
 
 (defn installed?
   "Check to see if a dependency is installed locally."
