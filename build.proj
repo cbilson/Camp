@@ -63,6 +63,12 @@
     <Resources Include="resources\templates\core.clj.razor">
       <LogicalName>templates.core.clj</LogicalName>
     </Resources>
+    <Resources Include="resources\templates\webapp\project.razor">
+      <LogicalName>templates.webapp.project.clj</LogicalName>
+    </Resources>
+    <Resources Include="resources\templates\webapp\core.clj.razor">
+      <LogicalName>templates.webapp.core.clj</LogicalName>
+    </Resources>
   </ItemGroup>
 
   <Target Name="RestorePackages">
@@ -137,6 +143,12 @@
   <Target Name="TestNew" DependsOnTargets="Compile">
     <Delete Files="$(TestProjectName)" />
     <Exec Command="$(TargetsDir)camp.exe new $(TestProjectName)"
+          WorkingDirectory="$(MSBuildThisFileDirectory)" />
+  </Target>
+
+  <Target Name="TestNewWebApp" DependsOnTargets="Compile">
+    <Delete Files="$(TestProjectName)" />
+    <Exec Command="$(TargetsDir)camp.exe new webapp $(TestProjectName)"
           WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
 

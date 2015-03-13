@@ -153,6 +153,9 @@
    - Right now I avoid "-" "_" in test project names because I don't
      know what will happen :-(.
      
+** BACKLOG Library for making webapi more palatable for clojure use
+   - defcontroller?
+
 * Ideas
 
 ** Camping Metaphor

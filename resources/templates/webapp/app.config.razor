@@ -1,0 +1,12 @@
+@inherits Westwind.RazorHosting.RazorTemplateBase
+@string startupClass = string.Format("{0}.core", Model["name"])
+@string startupAssembly = string.Format("{0}.core", Model["name"])
+<configuration>
+  <appSettings>
+    <add key="owin:appStartup"
+	 value="@startupClass, @startupAssembly" />
+  </appSettings>
+  <system.web>
+    <httpRuntime targetFramework="4.5" />
+  </system.web>
+</configuration>

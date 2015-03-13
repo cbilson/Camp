@@ -1,0 +1,17 @@
+@inherits Westwind.RazorHosting.RazorTemplateBase
+(ns @string.Format("{0}.core", Model["name"])
+    (:import [Owin]
+             [Microsoft.Owin IOwinContext]
+             [Microsoft.Owin.Hosting WebApp StartOptions])
+  (:gen-class))
+
+(defn handler [context]
+  (let [t (.. DateTime/Now Milliseconds ToString)]
+    (.. context Response WriteAsync (str t " TODO: @Model["Name"] all the things"))))
+
+(defn Configuration [app]
+  (.Run app handler))
+
+(defn -main [& args]
+  (let [options (doto (StartOptions.)
+                  (.AppStartup ""))]))
