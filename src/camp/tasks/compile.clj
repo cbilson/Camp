@@ -59,7 +59,8 @@
   (doseq [source-file-name (nuget/libs proj)]
     (let [file-name (io/file-name-only source-file-name)
           destination-file-name (io/file targets-path file-name)]
-      (when (not (io/file-exists? destination-file-name))
+      (when (or (not (io/file-exists? destination-file-name))
+                (io/newer? source-file-name destination-file-name))
         (verbose "Copying" source-file-name "to" destination-file-name)
         (io/copy source-file-name destination-file-name)))))
 
