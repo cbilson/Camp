@@ -30,6 +30,13 @@
   [name]
   (File/Exists name))
 
+(defn newer?
+  "Determine if one file, a, is newer than another file, b."
+  [a b]
+  (> (DateTime/Compare (File/GetLastWriteTimeUtc a)
+                       (File/GetLastWriteTimeUtc b))
+     0))
+
 (defn file
   "TODO: pull request to clojure-clr? Need approval from work, sign contributor
   agreement, ..., friction."
