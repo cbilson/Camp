@@ -50,7 +50,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Sources Include="$(SourceDir)**/*.clj" />
+    <Sources Include="$(SourceDir)**/*.clj" Exclude="*#*" />
   </ItemGroup>
 
   <ItemGroup>
