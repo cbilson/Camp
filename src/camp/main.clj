@@ -4,18 +4,38 @@
             [camp.project :as proj])
   (:gen-class))
 
+(defn- update-project-if [project switch path val]
+  (if switch (assoc-in project path val) project))
+
+(defn- arg? [arg-set & names]
+  (some arg-set names))
+
+(defn- parse-options
+  "Check for command shared flags in the args and adjust the project accordingly."
+  [args]
+  (let [arg-set (set args)]
+    (assoc core/*options*
+           :debug?  (arg? arg-set "--debug" "-vv")
+           :verbose? (arg? arg-set "--verbose" "-v")
+           :info? (not (arg? arg-set "--quiet" "-q")))))
+
+(defn- apply-task [project args]
+  (let [task-name (or (first args) "help")
+        task (core/resolve-task task-name)]
+    (or (apply task project (rest args)) 0)))
+
 (defn -main
   "Entry point for camp. Resolve first argument as camp.tasks.<name>/<name>,
 load project.clj if any, then invoke task function with project as first argument
-and rest of arguments."
+  and rest of arguments."
   [& args]
-  (try
-    (let [task (if-let [task-name (first args)]
-                 (core/resolve-task task-name)
-                 (core/resolve-task "help"))
-          project (proj/read-project)]
-      (or (apply task project (rest args)) 0))
-    (catch Exception e
-      (println (str "Error: " (.ToString e)))
-      -1)))
-    
+  (binding [core/*options* (parse-options args)]
+    (let [project (proj/read-project)]
+      (try
+        (apply-task project args)
+        (catch Exception e
+          (println (str "Error: "
+                        (if (:verbose? project)
+                          (.ToString e)
+                          (.Message e))))
+          -1)))))
