@@ -141,13 +141,13 @@
   </Target>
 
   <Target Name="TestNew" DependsOnTargets="Compile">
-    <Delete Files="$(TestProjectName)" />
+    <RemoveDir Directories="$(TestProjectName)" />
     <Exec Command="$(TargetsDir)camp.exe new $(TestProjectName)"
           WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
 
   <Target Name="TestNewWebApp" DependsOnTargets="Compile">
-    <Delete Files="$(TestProjectName)" />
+    <RemoveDir Directories="$(TestProjectName)" />
     <Exec Command="$(TargetsDir)camp.exe new webapp $(TestProjectName)"
           WorkingDirectory="$(MSBuildThisFileDirectory)" />
   </Target>
