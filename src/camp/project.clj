@@ -48,7 +48,8 @@
   `(let [args# ~(merge project-defaults
                        (apply hash-map (unquote-project args))
                        {:name (str project-name)
-                        :version version})]
+                        :version version
+                        :root (io/directory *file*)})]
      (def ~'project args#)))
 
 (defn eval-project [file-name]
@@ -65,3 +66,10 @@
    (if-not (io/file-exists? project-file-name)
      {}
      (eval-project project-file-name))))
+
+(defn resolve-relative-path
+  "Given a path, if it's not rooted, combine it with the project's root path."
+  [{:keys [root] :as project} maybe-relative-path]
+  (if (io/rooted? maybe-relative-path)
+    maybe-relative-path
+    (io/file root maybe-relative-path)))
