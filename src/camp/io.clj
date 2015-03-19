@@ -25,6 +25,18 @@
 (defn current-directory []
   (Directory/GetCurrentDirectory))
 
+(defn set-current-directory [path]
+  (Directory/SetCurrentDirectory path))
+
+(defmacro with-current-directory
+  "Do something with current directory set to some value then restore it."
+  [path & forms]
+  `(let [original# (current-directory)]
+    (set-current-directory ~path)
+    (try
+      ~@forms
+      (finally (set-current-directory original#)))))
+
 (defn file-exists?
   "Check to see if a file exists."
   [name]
@@ -56,8 +68,17 @@
 (defn file-name-only [file-name]
   (Path/GetFileName file-name))
 
+(defn directory [file-name]
+  (Path/GetDirectoryName file-name))
+
 (defn file-name-without-extension [file-name]
   (Path/GetFileNameWithoutExtension file-name))
 
 (defn copy [src dst]
   (File/Copy src dst))
+
+(defn resolve-path [path]
+  (Path/GetFullPath path))
+
+(defn rooted? [path]
+  (Path/IsPathRooted path))
