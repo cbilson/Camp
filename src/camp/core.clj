@@ -1,22 +1,10 @@
 (ns camp.core
-  (:require [clojure.edn :as edn]
-            [clojure.clr.io :as io]
+  (:require [clojure.clr.io :as io]
+            [clojure.string :as str]
             [camp.io :as cio])
   (:import [System Environment]
            [System.IO File]
            [clojure.lang PushbackTextReader]))
-
-(defn getenv
-  "Get the value of an environment variable"
-  ([name] (getenv name nil))
-  ([name default-value]
-   (or (Environment/GetEnvironmentVariable name)
-       default-value)))
-
-(defn setenv
-  "Sets an environment variable's value."
-  ([name value]
-   (Environment/SetEnvironmentVariable name value)))
 
 (def ^:dynamic *options*
   {:error? true
@@ -39,6 +27,15 @@
 
 (defn error [& messages]
   (print-when :error? messages))
+
+(defn env
+  "Get or set the value of an environment variable."
+  ([name]
+   (let [val (Environment/GetEnvironmentVariable name)]
+     (debug "env" name "->" (pr-str val))))
+  ([name value]
+   (debug "setenv" name "=" (pr-str value))
+   (Environment/SetEnvironmentVariable name value)))
 
 (defn to-dictionary [m]
   (let [d (|System.Collections.Generic.Dictionary`2[System.String,System.String]|.)]
