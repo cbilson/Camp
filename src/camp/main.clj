@@ -13,11 +13,11 @@
 (defn- parse-options
   "Check for command shared flags in the args and adjust the project accordingly."
   [args]
-  (let [arg-set (set args)]
-    (assoc core/*options*
-           :debug?  (arg? arg-set "--debug" "-vv")
-           :verbose? (arg? arg-set "--verbose" "-v")
-           :info? (not (arg? arg-set "--quiet" "-q")))))
+  (let [arg-set (set args)
+        debug? (arg? arg-set "--debug" "-vv")
+        verbose? (or debug? (arg? arg-set "--verbose" "-v"))
+        info? (or verbose? (not (arg? arg-set "--quiet" "-q")))]
+    (assoc core/*options* :debug?  debug? :verbose? verbose? :info? info?)))
 
 (defn- apply-task [project args]
   (let [task-name (or (first args) "help")
