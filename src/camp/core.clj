@@ -16,6 +16,9 @@
 (defn print-when [flag messages]
   (when (*options* flag) (apply println messages)))
 
+(defn debug [& messages]
+  (print-when :debug? messages))
+
 (defn verbose [& messages]
   (print-when :verbose? messages))
 
