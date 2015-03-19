@@ -74,20 +74,18 @@
 
 (defn- compile-sources
   [{:keys [root targets-path] :as project}]
-  (env "CLOJURE_LOAD_PATH" (p/resolve-relative-path project targets-path))
   (doseq [{src-path :path sources :sources} (analyze-sources project)
           :let [stale (->> sources (filter :stale?))]]
-    (io/with-current-directory src-path
-      (verbose "current directory:" (io/current-directory))
-      (binding [*compile-path* (p/resolve-relative-path project src-path)
-                *compile-files* true]
-        (debug "*compile-path*:" *compile-path*)
-        (debug "*compile-files*:" *compile-files*)
-        
-        ;; TODO: change sources -> stale
-        (doseq [ns (map :ns sources)]
-          (verbose "\tcompiling" ns)
-          (clojure.core/compile ns))))))
+    (env "CLOJURE_LOAD_PATH" (p/resolve-relative-path project src-path))
+    (binding [*compile-path* (p/resolve-relative-path project targets-path)
+              *compile-files* true]
+      (debug "*compile-path*:" *compile-path*)
+      (debug "*compile-files*:" *compile-files*)
+      
+      ;; TODO: change sources -> stale
+      (doseq [ns (map :ns sources)]
+        (verbose "\tcompiling" ns)
+        (clojure.core/compile ns)))))
 
 (defn- find-target
   [{:keys [targets-path] :as proj} name]
@@ -108,8 +106,7 @@
       (io/mkdir targets-path))
     (copy-dep-libs proj)
 
-    ;; TODO: Hook up AppDomain.CurrentDomain.AssemblyResolve
-    ;; to resolve assemblies from targets directory
+    ;; setup our own resoler to resolve from targets
     (let [resolver
           (gen-delegate
            ResolveEventHandler [sender args]

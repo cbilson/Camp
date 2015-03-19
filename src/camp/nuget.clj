@@ -2,18 +2,23 @@
 
 (ns camp.nuget
   "Functions for working with nuget."
-  (:require [camp.core :refer [verbose]]
+  (:require [camp.core :refer [debug verbose]]
             [camp.io :as io])
   (:import [System.Runtime.Versioning FrameworkName]
            [NuGet
             IFrameworkTargetable
             IPackage
+            IPackageRepository
+            IPackageLookup
             LocalPackageRepository
             PackageBuilder PackageExtensions PackageHelper
             PackageExtensions PackageHelper
             PackageManager PackageRepositoryFactory
             PackageReference SemanticVersion
             VersionUtility]))
+
+(defn pkg-builder []
+  (PackageBuilder.))
 
 (defn local-repo
   "Create a local package repository for a project."
@@ -57,18 +62,14 @@
   [^IPackage pkg]
   (str (.Id pkg) "." (.Version pkg)))
 
-(defn package-ref
-  "Convert a dependency in a project to a NuGet PackageReference."
-  [proj [id ver]]
-  (let [ver (semver ver)
-        fw (framework proj)]
-    (PackageReference. (str id) ver nil fw false false)))
-
 (defn find-package
   "Finds a locally installed package object."
   [pm [id ver]]
   (let [repo (.LocalRepository pm)]
     (.FindPackage repo (str id) (semver ver))))
+
+(defn local-packages [^LocalPackageRepository repo]
+  (seq (.GetPackages repo)))
 
 (defn pkg-files
   "Get all the files in all the packages in a project."
@@ -81,23 +82,28 @@
   "Gets the full path to IFrameorkTargetable items in the packages
   directory that are compatible with the project's framework."
   ([proj type]
-   (mapcat (partial compatible-items proj type) (:dependencies proj)))
+   (let [repo (local-repo proj)]
+     (mapcat (partial compatible-items proj repo type) (local-packages repo))))
    
-  ([{packages-path :packages-path :as proj} type dep]
+  ([{packages-path :packages-path :as proj}
+    ^LocalPackageRepository repo
+    type
+    ^IPackage package]
+   (debug "looking for compatible" type "in" (full-name package))
    (let [pm (package-mgr proj)
          selector (type {:libs #(PackageExtensions/GetLibFiles %)
                          :tools #(PackageExtensions/GetToolFiles %)
                          :content #(PackageExtensions/GetContentFiles %)})
-         pkg (find-package pm dep)
-         items (selector pkg)
+         items (selector package)
          compatible-items nil]
      (if (VersionUtility/TryGetCompatibleItems
       (type-args NuGet.IPackageFile)
       (framework proj)
-      (selector pkg)
+      (selector package)
       (by-ref compatible-items))
-       (map (partial io/file packages-path (full-name pkg)) compatible-items)
-       (verbose "No compatible" (name type) "in" (full-name pkg))))))
+       (map (partial io/file packages-path (full-name package))
+                       compatible-items)
+       (verbose "No compatible" (name type) "in" (full-name package))))))
 
 (defn libs
   "Get the libs from all the dependencies in the project."
@@ -124,5 +130,3 @@
   [pm [id ver]]
   (.InstallPackage pm (str id) (semver ver) false false))
 
-(defn pkg-builder []
-  (PackageBuilder.))

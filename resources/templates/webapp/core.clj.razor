@@ -1,17 +1,20 @@
 @inherits Westwind.RazorHosting.RazorTemplateBase
-(ns @string.Format("{0}.core", Model["name"])
-    (:import [Owin]
-             [Microsoft.Owin IOwinContext]
-             [Microsoft.Owin.Hosting WebApp StartOptions])
-  (:gen-class))
+(assembly-load "Owin")
+(assembly-load "Microsoft.Owin.Diagnostics")
+(assembly-load "Microsoft.Owin.Hosting")
 
-(defn handler [context]
-  (let [t (.. DateTime/Now Milliseconds ToString)]
-    (.. context Response WriteAsync (str t " TODO: @Model["Name"] all the things"))))
+@string coreNs = string.Format("{0}.core", Model["name"])
+(ns @coreNs
+(:import [Microsoft.Owin.Hosting StartOptions WebApp]
+           [Owin IAppBuilder WelcomePageExtensions])
+  (:gen-class
+   :methods [[Configuration [Owin.IAppBuilder] void]]))
 
-(defn Configuration [app]
-  (.Run app handler))
+(defn -Configuration [_ ^IAppBuilder app]
+  (WelcomePageExtensions/UseWelcomePage app))
 
 (defn -main [& args]
-  (let [options (doto (StartOptions.)
-                  (.AppStartup ""))]))
+  (let [options (StartOptions. "http://localhost:9000/")]
+    (set! (.AppStartup options) "@coreNs")
+    (with-open [app (WebApp/Start options)]
+      (println "Server running. Press [Enter] to stop.")
