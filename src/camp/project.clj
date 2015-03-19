@@ -33,7 +33,7 @@
   {:name ""
    :version "0.1.0-SNAPSHOT"
    :safe-name ""
-   :target-framework "net40"
+   :target-framework "net45"
    :nuget-repository "https://nuget.org/api/v2"
    :deploy-repository "https://nuget.org/api/v2"
    :root (io/current-directory)
