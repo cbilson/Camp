@@ -20,7 +20,7 @@
       (when (or (not (io/file-exists? destination-file-name))
                 (io/newer? source-file-name destination-file-name))
         (verbose "Copying" source-file-name "to" destination-file-name)
-        (io/copy source-file-name destination-file-name)))))
+        (io/copy source-file-name destination-file-name true)))))
 
 (defn- source-file->target-ns
   "To go from a source file path to a namespace, we need to remove

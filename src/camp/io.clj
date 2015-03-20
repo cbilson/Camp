@@ -75,8 +75,11 @@
 (defn file-name-without-extension [file-name]
   (Path/GetFileNameWithoutExtension file-name))
 
-(defn copy [src dst]
-  (File/Copy src dst))
+(defn copy
+  ([src dst]
+   (File/Copy src dst))
+  ([src dst overwrite?]
+   (File/Copy src dst overwrite?)))
 
 (defn resolve-path [path]
   (Path/GetFullPath path))
