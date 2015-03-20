@@ -3,7 +3,7 @@
 (assembly-load "Microsoft.Owin.Diagnostics")
 (assembly-load "Microsoft.Owin.Hosting")
 
-@string coreNs = string.Format("{0}.core", Model["name"])
+@{string coreNs = string. Format ("{0}.core", Model["name"]);}
 (ns @coreNs
 (:import [Microsoft.Owin.Hosting StartOptions WebApp]
            [Owin IAppBuilder WelcomePageExtensions])
