@@ -2,8 +2,10 @@
 (assembly-load "Owin")
 (assembly-load "Microsoft.Owin.Diagnostics")
 (assembly-load "Microsoft.Owin.Hosting")
-
-@{string coreNs = string. Format ("{0}.core", Model["name"]);}
+@{
+string coreNs = string.Format("{0}.core", Model["name"]);
+string coreAssemblyName = string.Format("{0}.core", Model["safe-name"]);
+}
 (ns @coreNs
 (:import [Microsoft.Owin.Hosting StartOptions WebApp]
            [Owin IAppBuilder WelcomePageExtensions])
@@ -15,6 +17,7 @@
 
 (defn -main [& args]
   (let [options (StartOptions. "http://localhost:9000/")]
-    (set! (.AppStartup options) "@coreNs")
+    (set! (.AppStartup options) "@coreAssemblyName")
     (with-open [app (WebApp/Start options)]
       (println "Server running. Press [Enter] to stop.")
+      (read-line))))
