@@ -1,6 +1,7 @@
 (ns camp.project
   "Functions for doing things with the project."
   (:require [clojure.walk :as walk]
+            [camp.core :refer [debug warn]]
             [camp.io :as io]))
 
 (declare unquote-project)
@@ -84,3 +85,35 @@
   (if (io/rooted? maybe-relative-path)
     maybe-relative-path
     (io/file root maybe-relative-path)))
+
+(defn find-target
+  [{:keys [targets-path] :as proj} name]
+  (let [targets (resolve-relative-path proj targets-path)]
+    (->> [(io/file targets (str name ".dll"))]
+         (filter io/file-exists?)
+         first)))
+
+(defn resolve-assembly
+  [proj name]
+  (if-let [file (find-target proj name)]
+    (do
+      (debug "Resolved" file)
+      (System.Reflection.Assembly/LoadFrom file))
+    (warn "Failed to resolve" name)))
+
+(defn resolve-assembly-delegate
+  [proj]
+  (fn [_ event-args]
+    (resolve-assembly proj (.Name event-args))))
+
+(defmacro with-assembly-resolution
+  "Eval forms with the AppDomain setup to resolve assemblies from
+  the targets folder."
+  [proj & forms]
+  `(let [resolver# (resolve-assembly-delegate ~proj)]
+     (.add_AssemblyResolve (AppDomain/CurrentDomain) resolver#)
+     (try
+       ~@forms
+       (finally
+         (.remove_AssemblyResolve (AppDomain/CurrentDomain) resolver#)))))
+

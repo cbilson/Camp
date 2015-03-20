@@ -77,7 +77,7 @@
 ;; niceties.
 (defn- compile-sources
   "Compile the source files in the project to assemblies, one per file."
-  [{:keys [name root targets-path] :as project}]
+  [{:keys [name targets-path] :as project}]
   (info "Compiling" name)
   (doseq [{src-path :path sources :sources} (analyze-sources project)
           :let [stale (->> sources (filter :stale?))]]
@@ -92,13 +92,6 @@
           (verbose "\tcompiling" ns)
           (clojure.core/compile ns))))))
 
-(defn- find-target
-  [{:keys [targets-path] :as proj} name]
-  (let [targets (p/resolve-relative-path proj targets-path)]
-    (->> [(io/file targets (str name ".dll"))]
-         (filter io/file-exists?)
-         first)))
-
 (defn compile
   "Compile task, to compile the project into assemblies and exes."
   [{:keys [targets-path] :as proj} & _]
@@ -110,18 +103,9 @@
       (io/mkdir targets-path))
     (copy-dep-libs proj)
 
-    ;; setup our own resolver to resolve from targets
-    (let [resolver
-          (gen-delegate
-           ResolveEventHandler [sender args]
-           (if-let [file (find-target proj (.Name args))]
-             (do
-               (debug "Resolved" file)
-               (System.Reflection.Assembly/LoadFrom file))
-             (warn "Failed to resolve" (.Name args))))]
-      (.add_AssemblyResolve (AppDomain/CurrentDomain) resolver)
-      (compile-sources proj)
-      (.remove_AssemblyResolve (AppDomain/CurrentDomain) resolver))
+    (p/with-assembly-resolution
+      proj
+      (compile-sources proj))
 
     (catch Exception ex
       (error "Error:" (.Message ex))
