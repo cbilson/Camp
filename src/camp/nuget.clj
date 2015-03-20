@@ -76,7 +76,7 @@
           (framework proj)
           (selector package)
           (by-ref compatible-items))
-       (map #(.Path %) compatible-items)
+       (map #(.SourcePath %) compatible-items)
        (verbose "No compatible" (name type) "in" (full-name package))))))
 
 (defn libs
@@ -101,6 +101,6 @@
 
 (defn install!
   "Install a dependency locally."
-  [pm [id ver]]
-  (verbose "Installing" id ver)
+  [pm [id ver :as dep]]
+  (verbose "Installing" dep)
   (.InstallPackage pm (str id) (semver ver) false false))

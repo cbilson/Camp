@@ -1,11 +1,9 @@
 (ns camp.tasks.deps
   "Functions for managing dependencies in the project."
-  (:require [camp.core :refer [verbose]]
-            [camp.nuget :as nuget]))
+  (:require [camp.nuget :as nuget]))
 
 (defn- ensure-installed! [proj pm dep]
   (when (not (nuget/installed? proj pm dep))
-    (verbose "Installing" dep)
     (nuget/install! pm dep)))
 
 (defn deps
