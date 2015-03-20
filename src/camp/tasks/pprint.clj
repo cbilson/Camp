@@ -2,5 +2,5 @@
   "Pretty print a project."
   (:require [clojure.pprint :as pp]))
 
-(defn pprint [project]
+(defn pprint [project & _]
   (pp/pprint project))
