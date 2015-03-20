@@ -23,7 +23,7 @@
     <copyright>Chris Bilson, 2015</copyright>
     <licenseUrl>https://raw.githubusercontent.com/cbilson/camp/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <!--<iconUrl>http://cdn.rawgit.com/__REPLACE_YOUR_REPO__/master/icons/camp.png</iconUrl>-->
+    <iconUrl>http://cdn.rawgit.com/cbilson/camp/master/camp.png</iconUrl>
     <!--<dependencies>
       <dependency id="" version="__VERSION__" />
       <dependency id="" />
