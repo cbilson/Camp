@@ -3,7 +3,7 @@
   directory for compilation."
   (:refer-clojure :exclude [compile])
   (:require [clojure.string :as str]
-            [camp.core :refer [env debug verbose warn error]]
+            [camp.core :refer [env debug verbose info warn error]]
             [camp.io :as io]
             [camp.nuget :as nuget]
             [camp.project :as p]
@@ -42,17 +42,17 @@
       (str/replace io/directory-separator ".")
       (String/Concat ".dll")))
 
-;; 
+;;
 ;; We'll use a map with the following keys to track information about sources in
 ;; the project:
-;; 
+;;
 ;; | Key     | Meaning                                                  |
 ;; +---------+----------------------------------------------------------+
 ;; | :path   | path relative to the root of the project                 |
 ;; | :ns     | the namespace the source should produce                  |
 ;; | :target | the target assembly the source file should compile to    |
 ;; | :stale? | true if the target assembly is older than the source.    |
-;; 
+;;
 (defn- analyze-sources [{:keys [source-paths] :as project}]
   (for [path source-paths]
     {:path path
@@ -63,8 +63,7 @@
         :root path
         :ns (source-file->target-ns path source-file)
         :target target
-        :stale? (io/newer? source-file target)
-        })}))
+        :stale? (io/newer? source-file target)})}))
 
 (defn- compile-source-file
   "Compile a single source file."
@@ -72,31 +71,36 @@
   (verbose "\t\tCompiling" target-ns)
   (clojure.core/compile target-ns))
 
+;; TODO: Come up with a better way to work with the compiler. Maybe use the
+;; GenContext and Compiler classes in the clojure compiler directly, to avoid
+;; generating so many assemblies, be able to add assembly attributes, and other
+;; niceties.
 (defn- compile-sources
-  [{:keys [root targets-path] :as project}]
+  "Compile the source files in the project to assemblies, one per file."
+  [{:keys [name root targets-path] :as project}]
+  (info "Compiling" name)
   (doseq [{src-path :path sources :sources} (analyze-sources project)
           :let [stale (->> sources (filter :stale?))]]
-    (env "CLOJURE_LOAD_PATH" (p/resolve-relative-path project src-path))
-    (binding [*compile-path* (p/resolve-relative-path project targets-path)
-              *compile-files* true]
-      (debug "*compile-path*:" *compile-path*)
-      (debug "*compile-files*:" *compile-files*)
-      
-      ;; TODO: change sources -> stale
-      (doseq [ns (map :ns sources)]
-        (verbose "\tcompiling" ns)
-        (clojure.core/compile ns)))))
+    (when (not (empty? stale))
+      (env "CLOJURE_LOAD_PATH" (p/resolve-relative-path project src-path))
+      (binding [*compile-path* (p/resolve-relative-path project targets-path)
+                *compile-files* true]
+        (debug "*compile-path*:" *compile-path*)
+        (debug "*compile-files*:" *compile-files*)
+
+        (doseq [ns (map :ns stale)]
+          (verbose "\tcompiling" ns)
+          (clojure.core/compile ns))))))
 
 (defn- find-target
   [{:keys [targets-path] :as proj} name]
   (let [targets (p/resolve-relative-path proj targets-path)]
-    (verbose "targets:" targets)
     (->> [(io/file targets (str name ".dll"))]
          (filter io/file-exists?)
          first)))
 
 (defn compile
-  "Compile the project into assemblies and exes."
+  "Compile task, to compile the project into assemblies and exes."
   [{:keys [targets-path] :as proj} & _]
   (try
     (verbose "Checking deps" targets-path)
@@ -106,20 +110,19 @@
       (io/mkdir targets-path))
     (copy-dep-libs proj)
 
-    ;; setup our own resoler to resolve from targets
+    ;; setup our own resolver to resolve from targets
     (let [resolver
           (gen-delegate
            ResolveEventHandler [sender args]
-           (verbose "Resolving" (.Name args))
            (if-let [file (find-target proj (.Name args))]
              (do
-               (verbose "Resolved" file)
+               (debug "Resolved" file)
                (System.Reflection.Assembly/LoadFrom file))
              (warn "Failed to resolve" (.Name args))))]
       (.add_AssemblyResolve (AppDomain/CurrentDomain) resolver)
       (compile-sources proj)
       (.remove_AssemblyResolve (AppDomain/CurrentDomain) resolver))
-    
+
     (catch Exception ex
       (error "Error:" (.Message ex))
       (verbose (.ToString ex)))))

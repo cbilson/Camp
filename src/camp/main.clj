@@ -1,13 +1,12 @@
-;; -*- compile-command: "msbuild /t:CampExe /verbosity:minimal && targets\camp.main.exe new scratch-project"
 (ns camp.main
+  "The camp command line program entry point."
   (:require [camp.core :as core]
             [camp.project :as proj])
   (:gen-class))
 
-(defn- update-project-if [project switch path val]
-  (if switch (assoc-in project path val) project))
-
-(defn- arg? [arg-set & names]
+(defn- arg?
+  "Determine if an argument was supplied."
+  [arg-set & names]
   (some arg-set names))
 
 (defn- parse-options
@@ -19,7 +18,10 @@
         info? (or verbose? (not (arg? arg-set "--quiet" "-q")))]
     (assoc core/*options* :debug?  debug? :verbose? verbose? :info? info?)))
 
-(defn- apply-task [project args]
+(defn- apply-task
+  "Given a project and args, lookup the task (always the 1st argument)
+  and apply it to the project and the rest of the arguments."
+  [project args]
   (let [task-name (or (first args) "help")
         task (core/resolve-task task-name)]
     (or (apply task project (rest args)) 0)))
@@ -38,4 +40,4 @@ load project.clj if any, then invoke task function with project as first argumen
                         (if (:verbose? project)
                           (.ToString e)
                           (.Message e))))
-          -1)))))
+          (Environment/Exit -1))))))

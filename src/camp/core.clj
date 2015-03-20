@@ -3,7 +3,7 @@
             [clojure.string :as str]
             [camp.io :as cio])
   (:import [System Environment]
-           [System.IO File]
+           [System.IO File StreamReader]
            [clojure.lang PushbackTextReader]))
 
 (def ^:dynamic *options*
@@ -60,3 +60,17 @@
       (let [ns-sym (symbol "camp.tasks.help")]
         (require ns-sym)
         (resolve (symbol ns-sym "help"))))))
+
+(defn resource
+  "Get a resource stream for some named resource in an assembly."
+  [assembly name]
+  (if-let [res (.GetManifestResourceStream assembly name)]
+    res
+    (throw (ex-info "Resource not found."
+                    {:assembly assembly :name name}))))
+
+(defn resource-reader
+  "Load a template from a named resource."
+  [assembly name]
+  (-> (resource assembly name)
+      (StreamReader.)))

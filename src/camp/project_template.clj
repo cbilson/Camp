@@ -1,5 +1,5 @@
 (ns camp.project-template
-  "Templates for new camp projects."
+  "Built-in templates for new camp projects."
   (:require [camp.io :as cio]
             [camp.templates :as t]))
 

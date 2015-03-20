@@ -1,10 +1,18 @@
 (ns camp.project
+  "Functions for doing things with the project."
   (:require [clojure.walk :as walk]
             [camp.io :as io]))
 
 (declare unquote-project)
 
 (defn- unquote-step
+  "We want to allow some code inside the project file, but we don't want errors
+  when the project file uses a symbol that is not defined yet. For example:
+
+  (defproject ...
+    :deps [[SomeDep \"0.0.0\"]])
+
+  In this case, SomeDep is not a symbol that needs to be defined."
   [arg]
   (cond
     ;; seq starting with unquote? elide the unquote and let it get
@@ -29,6 +37,8 @@
   [args]
   (walk/walk unquote-step identity args))
 
+;; Default project attributes. Actually specified values are merged into this,
+;; replacing defaults.
 (def project-defaults
   {:name ""
    :version "0.1.0-SNAPSHOT"
@@ -59,8 +69,9 @@
     (ns-unmap 'camp.project 'project)
     @project))
 
+;; TODO: find-dominating-project
 (defn read-project
-  "Read  the project file."
+  "Read the project file."
   ([] (read-project "project.clj"))
   ([project-file-name]
    (if-not (io/file-exists? project-file-name)

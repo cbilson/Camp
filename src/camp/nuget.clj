@@ -5,20 +5,9 @@
   (:require [camp.core :refer [debug verbose]]
             [camp.io :as io])
   (:import [System.Runtime.Versioning FrameworkName]
-           [NuGet
-            IFrameworkTargetable
-            IPackage
-            IPackageRepository
-            IPackageLookup
-            LocalPackageRepository
-            PackageBuilder PackageExtensions PackageHelper
-            PackageExtensions PackageHelper
-            PackageManager PackageRepositoryFactory
-            PackageReference SemanticVersion
-            VersionUtility]))
-
-(defn pkg-builder []
-  (PackageBuilder.))
+           [NuGet IPackage IPackageRepository LocalPackageRepository
+            PackageExtensions PackageManager PackageRepositoryFactory
+            SemanticVersion VersionUtility]))
 
 (defn local-repo
   "Create a local package repository for a project."
@@ -47,28 +36,14 @@
   [{target-framework :target-framework}]
   (VersionUtility/ParseFrameworkName target-framework))
 
-(defn target-framework
-  "Get the target framework of a package."
-  [package]
-  (.TargetFramework package))
-
-(defn target-framework?
-  [proj ^IFrameworkTargetable ft]
-  (verbose "Supported frameworks:" (.SupportedFrameworks ft))
-  (some (partial = (framework proj)) (.SupportedFrameworks ft)))
-
 (defn full-name
   "Get the full name of a package object."
   [^IPackage pkg]
   (str (.Id pkg) "." (.Version pkg)))
 
-(defn find-package
-  "Finds a locally installed package object."
-  [pm [id ver]]
-  (let [repo (.LocalRepository pm)]
-    (.FindPackage repo (str id) (semver ver))))
-
-(defn local-packages [^LocalPackageRepository repo]
+(defn local-packages
+  "Get all the packages instaled in a "
+  [^IPackageRepository repo]
   (seq (.GetPackages repo)))
 
 (defn pkg-files
@@ -78,13 +53,13 @@
     (map (partial io/file (:packages-path proj))
          (.GetPackageLookupPaths repo (str id) (semver ver)))))
 
-(defn- compatible-items
+(defn compatible-items
   "Gets the full path to IFrameorkTargetable items in the packages
   directory that are compatible with the project's framework."
   ([proj type]
-   (let [repo (local-repo proj)]
-     (mapcat (partial compatible-items proj repo type) (local-packages repo))))
-   
+   (let [repo (local-repo proj)
+         packages (local-packages repo)]
+     (mapcat (partial compatible-items proj repo type) packages)))
   ([{packages-path :packages-path :as proj}
     ^LocalPackageRepository repo
     type
@@ -97,12 +72,11 @@
          items (selector package)
          compatible-items nil]
      (if (VersionUtility/TryGetCompatibleItems
-      (type-args NuGet.IPackageFile)
-      (framework proj)
-      (selector package)
-      (by-ref compatible-items))
-       (map (partial io/file packages-path (full-name package))
-                       compatible-items)
+          (type-args NuGet.IPackageFile)
+          (framework proj)
+          (selector package)
+          (by-ref compatible-items))
+       (map #(.Path %) compatible-items)
        (verbose "No compatible" (name type) "in" (full-name package))))))
 
 (defn libs
@@ -128,5 +102,5 @@
 (defn install!
   "Install a dependency locally."
   [pm [id ver]]
+  (verbose "Installing" id ver)
   (.InstallPackage pm (str id) (semver ver) false false))
-

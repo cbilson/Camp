@@ -110,6 +110,8 @@
    - Maybe try Jeffery Richter idea
      - have a stub EXE with assemblies embedded as resources
      - there was some problem with that, though, too, AFAIR.
+   - Try using GenContext and Compiler directly, with one context,
+     generating one assembly.
 
 ** BACKLOG assembly attributes                                       :v_0_1_4:
    - Especially version attributes

@@ -1,4 +1,5 @@
 (ns camp.io
+  "Functions for doing IO."
   (:import [System.IO Path File Directory SearchOption]
            [clojure.lang PushbackTextReader]))
 
@@ -10,6 +11,7 @@
    (Directory/CreateDirectory (str name) access-control)))
 
 (defn files
+  "Get all files in some path."
   ([base-path]
    (Directory/GetFiles base-path))
   ([base-path pattern]
@@ -50,8 +52,7 @@
      0))
 
 (defn file
-  "TODO: pull request to clojure-clr? Need approval from work, sign contributor
-  agreement, ..., friction."
+  "Format a file name. Should be in clojure.clr.io."
   [& args]
   (Path/Combine (->> args (map str) to-array (into-array String))))
 

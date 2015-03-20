@@ -158,7 +158,7 @@
   </Target>
 
   <Target Name="TestCompile" DependsOnTargets="Compile">
-    <Exec Command="..\$(TargetsDir)camp.exe compile --debug"
+    <Exec Command="..\$(TargetsDir)camp.exe compile --verbose"
           WorkingDirectory="$(MSBuildThisFileDirectory)$(TestProjectName)" />
   </Target>
 
