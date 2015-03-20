@@ -4,7 +4,7 @@
   <metadata>
     <id>camp.portable</id>
     <title>camp (Portable)</title>
-    <version>0.1.0-alpha</version>
+    <version>0.1.0-alpha2</version>
     <authors>Chris Bilson</authors>
     <owners>Chris Bilson</owners>
     <summary>Camp helps setup your ClojureCLR tent.</summary>
@@ -24,10 +24,6 @@
     <licenseUrl>https://raw.githubusercontent.com/cbilson/camp/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <iconUrl>http://cdn.rawgit.com/cbilson/camp/master/camp.png</iconUrl>
-    <!--<dependencies>
-      <dependency id="" version="__VERSION__" />
-      <dependency id="" />
-    </dependencies>-->
     <releaseNotes>Initial release.</releaseNotes>
   </metadata>
   <files>
