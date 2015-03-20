@@ -5,7 +5,6 @@
 (defn package
   "The equivalent of `nuget pack'."
   [project & _]
-  (let [builder (nuget/pkg-builder)]
-    (println "TODO: Gather dlls, exes, and other content in targets/")
-    (println "TODO: Generate manifest")
-    (println "TODO: Create a new OptimizedZipPackage")))
+  (println "TODO: Gather dlls, exes, and other content in targets/")
+  (println "TODO: Generate manifest")
+  (println "TODO: Create a new OptimizedZipPackage"))
