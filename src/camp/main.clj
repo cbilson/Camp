@@ -9,6 +9,9 @@
   [arg-set & names]
   (some arg-set names))
 
+(def camp-options
+  #{"--debug" "-vv" "--verbose" "-v" "--quiet" "-q"})
+
 (defn- parse-options
   "Check for command shared flags in the args and adjust the project accordingly."
   [args]
@@ -28,8 +31,8 @@
 
 (defn -main
   "Entry point for camp. Resolve first argument as camp.tasks.<name>/<name>,
-load project.clj if any, then invoke task function with project as first argument
-  and rest of arguments."
+  load project.clj if any, then invoke task function with project as
+  first argument and rest of arguments."
   [& args]
   (binding [core/*options* (parse-options args)]
     (let [project (proj/read-project)]
