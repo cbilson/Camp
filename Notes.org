@@ -44,9 +44,8 @@
 ** DONE fix compile task to check deps                          :v_0_1_0:bug:
    CLOSED: [2015-02-21 Sat 11:31]
    
-** BLOCKED License						    :v_0_1_0:
-   - Waiting on LCA
-     
+** DONE License							    :v_0_1_0:
+   CLOSED: [2015-03-20 Fri 09:01]
 ** DONE License                                                     :v_0_1_0:
 ** DONE README.md                                                   :v_0_1_0:
    CLOSED: [2015-02-27 Fri 08:25]
@@ -63,17 +62,18 @@
      - This is easy and will add a lot of value in not making people
        have to futz with their PATH.
 
-** BACKLOG templates                                                 :v_0_1_0:
+** DONE templates						    :v_0_1_0:
+   CLOSED: [2015-03-20 Fri 08:59]
    - I like the way leiningen templates work. Something like that...
 
-** TODO deploy task  :v_0_1_0:
-   - I want this now, since tools.nrepl has no nuget package yet
-   - Must handle project names like org.clojure.clr/tools.nrepl
-     - maybe this should be called org.coljure.clr.tools.nrepl?
-     - See [[Deploy%20Task%20Package%20Naming][Deploy Task Package Naming]]
+** DONE repl							    :v_0_1_0:
+   CLOSED: [2015-03-20 Fri 08:59]
+   - just fire up a repl with the project loaded for now.
 
-** TODO icon for camp.exe :v_0_1_0:
+** WIP icon for camp.exe					    :v_0_1_1:
    - Make chocolatey stop complaining about missing icon.
+   - Tried adding an icon URL, but that appears to be for the
+     chocolatey website, not shimgen.
      
 ** TODO Announce                                                    :v_0_1_0:
    - screen casts
@@ -82,6 +82,12 @@
    - seajure
    - reddit
    - lobste.rs/hackernews, ...
+
+** TODO deploy task  :v_0_1_0:
+   - I want this now, since tools.nrepl has no nuget package yet
+   - Must handle project names like org.clojure.clr/tools.nrepl
+     - maybe this should be called org.coljure.clr.tools.nrepl?
+     - See [[Deploy%20Task%20Package%20Naming][Deploy Task Package Naming]]
 
 ** BACKLOG Camp always compiles with clojure it was compiled with :bug:v_0_1_1:
    - It's going to pick up the Clojure.dll in the camp.exe directory.
@@ -95,9 +101,6 @@
      0.1.1 on wards.
 
 ** BACKLOG clean task   :v_0_1_1:
-** BACKLOG repl                                                      :v_0_1_1:
-   - just fire up a repl with the project loaded for now.
-
 ** BACKLOG nrepl                                                     :v_0_1_2:
    - read somewhere that it "almost works"
 
@@ -150,11 +153,6 @@
    - For people that have private repos
    - So project :nuget-repository would be a vector or something
 
-** BACKLOG Crisp-ness around schema of project.clj
-   - What are legal project names anyway
-   - Right now I avoid "-" "_" in test project names because I don't
-     know what will happen :-(.
-     
 ** BACKLOG Library for making webapi more palatable for clojure use
    - defcontroller?
 
