@@ -89,13 +89,10 @@
   </Target>
 
   <Target Name="InitToolsDir">
-
-    <!-- copy clojure compiler tools into tools directory - you can't run them directly from packages... -->
     <Copy SourceFiles="@(Tools)"
           DestinationFolder="$(ToolsDir)"
           SkipUnchangedFiles="true" />
 
-    <!-- also copy libs to tools directory for compilation time -->
     <Copy SourceFiles="@(Libs)"
           DestinationFolder="$(ToolsDir)"
           SkipUnchangedFiles="true" />
@@ -176,8 +173,12 @@
     <Exec Command="$(ChocoExe) pack chocolatey\camp.nuspec" />
   </Target>
 
-  <Target Name="ChocoInstall" DependsOnTargets="ChocolateyPackage">
-    <Exec Command="$(ChocoExe) install --debug --force --pre --source chocolatey camp.portable" />
+  <Target Name="Install" DependsOnTargets="Package">
+    <Exec Command="$(ChocoExe) install --force --pre --source chocolatey camp.portable" />
+  </Target>
+
+    <Target Name="UnInstall">
+    <Exec Command="$(ChocoExe) uninstall --allversions camp.portable" />
   </Target>
 
   <Target Name="Clean">
