@@ -2,7 +2,7 @@
 
 (ns camp.nuget
   "Functions for working with nuget."
-  (:require [camp.core :refer [debug verbose]]
+  (:require [camp.core :refer [debug verbose info]]
             [camp.io :as io])
   (:import [System.Runtime.Versioning FrameworkName]
            [NuGet IPackage IPackageRepository LocalPackageRepository
@@ -102,5 +102,5 @@
 (defn install!
   "Install a dependency locally."
   [pm [id ver :as dep]]
-  (verbose "Installing" dep)
+  (info "Installing" dep)
   (.InstallPackage pm (str id) (semver ver) false false))
