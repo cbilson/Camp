@@ -4,7 +4,7 @@
   <metadata>
     <id>camp.portable</id>
     <title>camp (Portable)</title>
-    <version>0.1.0-alpha2</version>
+    <version>0.1.0-alpha3</version>
     <authors>Chris Bilson</authors>
     <owners>Chris Bilson</owners>
     <summary>Camp helps setup your ClojureCLR tent.</summary>
