@@ -11,7 +11,7 @@
   when the project file uses a symbol that is not defined yet. For example:
 
   (defproject ...
-    :deps [[SomeDep \"0.0.0\"]])
+  :deps [[SomeDep \"0.0.0\"]])
 
   In this case, SomeDep is not a symbol that needs to be defined."
   [arg]
@@ -103,8 +103,9 @@
 
 (defn resolve-assembly-delegate
   [proj]
-  (fn [_ event-args]
-    (resolve-assembly proj (.Name event-args))))
+  (gen-delegate
+   ResolveEventHandler [_ event-args]
+   (resolve-assembly proj (.Name event-args))))
 
 (defmacro with-assembly-resolution
   "Eval forms with the AppDomain setup to resolve assemblies from
@@ -116,4 +117,3 @@
        ~@forms
        (finally
          (.remove_AssemblyResolve (AppDomain/CurrentDomain) resolver#)))))
-
