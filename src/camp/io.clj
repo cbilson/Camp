@@ -44,6 +44,15 @@
   [name]
   (File/Exists name))
 
+(defn remove-dir!
+  ([path]
+   (Directory/Delete path))
+  ([path recursive?]
+   (Directory/Delete path recursive?)))
+
+(defn remove-file! [path]
+  (File/Delete path))
+
 (defn newer?
   "Determine if one file, a, is newer than another file, b."
   [a b]
