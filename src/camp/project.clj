@@ -2,7 +2,8 @@
   "Functions for doing things with the project."
   (:require [clojure.walk :as walk]
             [camp.core :refer [debug warn]]
-            [camp.io :as io]))
+            [camp.io :as io])
+  (:import [System.IO Path Directory]))
 
 (declare unquote-project)
 
@@ -70,14 +71,24 @@
     (ns-unmap 'camp.project 'project)
     @project))
 
-;; TODO: find-dominating-project
 (defn read-project
-  "Read the project file."
+  "Read the project file in the current directory or some parent directory."
   ([] (read-project "project.clj"))
   ([project-file-name]
-   (if-not (io/file-exists? project-file-name)
-     {}
-     (eval-project project-file-name))))
+   (loop [dir (Directory/GetCurrentDirectory)]
+     (let [proj-file (io/file dir project-file-name)
+           parent (Path/GetDirectoryName dir)]
+       (cond
+         (io/file-exists? proj-file)
+         (eval-project proj-file)
+
+         (nil? parent)
+         nil
+
+         :otherwise
+         (do
+           (debug "No" project-file-name "in" dir)
+           (recur (Path/GetDirectoryName dir))))))))
 
 (defn resolve-relative-path
   "Given a path, if it's not rooted, combine it with the project's root path."
