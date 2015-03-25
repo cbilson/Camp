@@ -2,15 +2,52 @@
 (assembly-load "Owin")
 (assembly-load "Microsoft.Owin.Diagnostics")
 (assembly-load "Microsoft.Owin.Hosting")
-@{
-string coreNs = string.Format("{0}.core", Model["name"]);
-string coreAssemblyName = string.Format("{0}.core", Model["safe-name"]);
-}
-(ns @coreNs
-(:import [Microsoft.Owin.Hosting StartOptions WebApp]
-           [Owin IAppBuilder WelcomePageExtensions])
-  (:gen-class
-   :methods [[Configuration [Owin.IAppBuilder] void]]))
+
+(ns @string.Format("{0}.core", Model["name"])
+    (:import [Microsoft.Owin.Hosting StartOptions WebApp]
+             [Owin IAppBuilder WelcomePageExtensions])
+    (:gen-class))
+
+(defn configure [^IAppBuilder app]
+  (WelcomePageExtensions/UseWelcomePage app))
+
+(defn start [& args]
+  (agent
+   (let [options (apply hash-map args)
+         port (or (:port options) 9000)
+         start-options (StartOptions. (str "http://localhost:" port "/"))]
+     ;; HACK: Microsoft.Owin.Hosting.WebApp.StartImplementation always tries to
+     ;; get startup.Method.ReflectedType.FullName, even if you give
+     ;; it a startup function, because it uses that to determine the
+     ;; app name, even if you give it one.
+     (set! (.AppStartup start-options) "my-webapp")
+     (WebApp/Start start-options configure))))
+
+(defn stop [app]
+  (.Dispose app))
+
+(def cmdline-switches {"--debug" :debug?})
+(def cmdline-switch-set (->> cmdline-switches keys hash-set))
+(def cmdline-options {"--port" :port})
+
+(defn -main [& args]
+  (let [switches (->> args (filter cmdline-switch-set) (map cmdline-switches))
+        options (->> args (remove cmdline-switche-set))
+        debug? (some #{"--debug"} switches)]
+    (try
+      (let [app (apply start args)]
+        (apply start args)
+        (println "Server running. Press [Enter] to stop.")
+        (read-line)
+        (send app stop)
+        0)
+      (catch Exception ex
+        (println "Error:" (.Message ex))
+        (when debug?
+          (binding [*out* *err*]
+            (println (.ToString ex))))
+        -1))))
+
 
 (defn -Configuration [_ ^IAppBuilder app]
   (WelcomePageExtensions/UseWelcomePage app))
