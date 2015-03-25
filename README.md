@@ -61,7 +61,14 @@ Note: the version specifier uses nuget's
 "1.6.0.1", you need to surround it in brackets, so the dependency
 spec would be like '[Clojure "[1.6.0.1]"]'.
 
-Use `camp deps` to fetch the dependencies.
+There is also a rudimentary template for building an OWIN based, self-hosted web application:
+
+```shell
+$ camp new webapp my-webapp
+```
+
+Once the project is created and you are in the root directory, use `camp deps` to
+fetch the dependencies.
 
 ```shell
 $ camp deps
@@ -194,7 +201,7 @@ webapp templates very soon.
 That's definately a major part of my plan. I haven't done any work to
 use NREPL CLR yet, but plan to very soon.
 
-### Can I use «my editor»?
+### Can I use Â«my editorÂ»?
 
 I suppose, once NREPL support is done. But I pretty much just use
 emacs, so I probably won't be doing any work on this. If you have to
@@ -208,7 +215,3 @@ vsClojure, but I know next to nothing about it. It might be easy to
 make camp and vsClojure work together, or it might not. I am not
 sufficiently motivated to look at this point, but if there is
 something I can do to help make it work, let me know.
-
-## License
-
-Umm...yes?
