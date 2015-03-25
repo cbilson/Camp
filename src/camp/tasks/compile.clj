@@ -16,7 +16,7 @@
   (doseq [source-file-name (nuget/libs proj)]
     (debug "lib:" source-file-name)
     (let [file-name (io/file-name-only source-file-name)
-          destination-file-name (io/file targets-path file-name)]
+          destination-file-name (p/resolve-relative-path targets-path file-name)]
       (when (or (not (io/file-exists? destination-file-name))
                 (io/newer? source-file-name destination-file-name))
         (verbose "Copying" source-file-name "to" destination-file-name)
