@@ -64,7 +64,7 @@
     ^LocalPackageRepository repo
     type
     ^IPackage package]
-   (debug "looking for compatible" type "in" (full-name package))
+   (debug "looking for compatible" (name type) "in" (full-name package))
    (let [pm (package-mgr proj)
          selector (type {:libs #(PackageExtensions/GetLibFiles %)
                          :tools #(PackageExtensions/GetToolFiles %)

@@ -89,8 +89,13 @@
         (debug "*compile-files*:" *compile-files*)
 
         (doseq [ns (map :ns stale)]
-          (verbose "\tcompiling" ns)
-          (clojure.core/compile ns))))))
+          (try
+            (verbose "\tcompiling" ns)
+            (clojure.core/compile ns)
+            (catch Exception ex
+              (error "Failed compiling" ns)
+              (error (.ToString ex))
+              (throw ex))))))))
 
 (defn compile
   "Compile task, to compile the project into assemblies and exes."
