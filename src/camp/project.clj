@@ -92,10 +92,11 @@
 
 (defn resolve-relative-path
   "Given a path, if it's not rooted, combine it with the project's root path."
-  [{:keys [root] :as project} maybe-relative-path]
-  (if (io/rooted? maybe-relative-path)
-    maybe-relative-path
-    (io/file root maybe-relative-path)))
+  [{:keys [root] :as project} & maybe-relative-path]
+  (let [path (apply io/file maybe-relative-path)]
+    (if (io/rooted? path)
+      path
+      (io/file root path))))
 
 (defn find-target
   [{:keys [targets-path] :as proj} name]
