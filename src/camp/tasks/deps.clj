@@ -5,5 +5,4 @@
 (defn deps
   "Fetch dependencies defined in the project file."
   [{:keys [dependencies] :as proj} & _]
-  (doseq [dep dependencies]
-    (nuget/install! proj dep)))
+  (nuget/install! proj dependencies))

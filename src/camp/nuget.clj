@@ -96,15 +96,16 @@
 
 (defn install!
   "Install a package. Based on command line NuGet's install command."
-  [{{pre-release? :allow-pre-release?} :nuget :as proj} [id ver :as dep]]
+  [{{pre-release? :allow-pre-release?} :nuget :as proj} deps]
   ;; Create package manager
   (let [pm (make-package-manager proj)]
-    ;; when not installed
-    (if (install-needed? proj dep pm)
-      (with-open [action (start-operation! pm "Install" dep)]
-        (info "Installing" dep)
-        (.InstallPackage pm (str id) (semver ver) false pre-release?))
-      (verbose dep "already installed"))))
+    (doseq [[id ver :as dep] deps]
+      ;; when not installed
+      (if (install-needed? proj dep pm)
+        (with-open [action (start-operation! pm "Install" dep)]
+          (info "Installing" dep)
+          (.InstallPackage pm (str id) (semver ver) false pre-release?))
+        (verbose dep "already installed")))))
 
 (defn framework
   "Get the proper framework version from a short nuget-ish :target-framework
