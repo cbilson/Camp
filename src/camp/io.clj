@@ -78,6 +78,13 @@
 (defn file-name-only [file-name]
   (Path/GetFileName file-name))
 
+(defn file-name-without-extension [file-name]
+  (Path/GetFileNameWithoutExtension file-name))
+
+(defn has-extension? [extension file-name]
+  (.Equals extension (Path/GetExtension file-name)
+           StringComparison/InvariantCultureIgnoreCase))
+
 (defn directory [file-name]
   (Path/GetDirectoryName file-name))
 
