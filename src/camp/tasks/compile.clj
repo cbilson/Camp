@@ -90,9 +90,6 @@
   (try
     (verbose "Checking deps" targets-path)
     (deps/deps proj)
-    (when (not (io/directory-exists? targets-path))
-      (verbose "Creating targets folder")
-      (io/mkdir targets-path))
 
     (p/with-assembly-resolution
       (nuget/libs proj)
