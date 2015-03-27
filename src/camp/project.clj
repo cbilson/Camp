@@ -1,6 +1,7 @@
 (ns camp.project
   "Functions for doing things with the project."
   (:require [clojure.walk :as walk]
+            [clojure.pprint :as pp]
             [camp.core :refer [debug warn]]
             [camp.io :as io])
   (:import [System.IO Path Directory]))
@@ -66,9 +67,15 @@
 
 (defn eval-project [file-name]
   (binding [*ns* (find-ns 'camp.project)]
+    (debug "Loading project" file-name)
     (load-file file-name))
   (let [project (resolve 'camp.project/project)]
+    (debug "ns-unmapping project")
     (ns-unmap 'camp.project 'project)
+    (with-open [w (System.IO.StringWriter.)]
+      (pp/pprint @project w)
+      (debug "Project:")
+      (debug w))
     @project))
 
 (defn read-project
@@ -80,10 +87,12 @@
            parent (Path/GetDirectoryName dir)]
        (cond
          (io/file-exists? proj-file)
-         (eval-project proj-file)
+         (do
+           (debug "found project:" proj-file)
+           (eval-project proj-file))
 
          (nil? parent)
-         nil
+         (debug "no project file found")
 
          :otherwise
          (do
