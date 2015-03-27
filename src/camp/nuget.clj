@@ -145,10 +145,14 @@
        (map #(.SourcePath %) compatible-items)
        (verbose "No compatible" (name type) "in" (full-name package))))))
 
+(defn- assembly-file? [file-name]
+  (or (io/has-extension? ".dll" file-name)
+      (io/has-extension? ".exe" file-name)))
+
 (defn libs
   "Get the libs from all the dependencies in the project."
   ([proj]
-   (compatible-items proj :libs)))
+   (filter assembly-file? (compatible-items proj :libs))))
 
 (defn tools
   "Get the tools from all the dependencies in the project."
