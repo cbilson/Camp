@@ -47,8 +47,26 @@
    :version "0.1.0-SNAPSHOT"
    :safe-name ""
    :target-framework "net45"
-   :nuget-repository "https://nuget.org/api/v2"
+   
+   :nuget {
+           ;; sources for nuget packages: :default, :v3, :v2-legacy-official,
+           ;; :v2-legacy, :v1, :vs-express-for-windows-8,
+           ;; or "https://myserver/nuget"
+           :sources [:official]
+
+           ;; package save mode: :None, :Nuspec, or :Nupkg
+           :save-mode :None
+
+           ;; false to *not* cache nuget packages
+           :cache? true
+
+           ;; true to allow pre-release packages
+           :allow-pre-release? false}
+
+   ;; nuget repository to deploy to
    :deploy-repository "https://nuget.org/api/v2"
+
+   ;; root directory of the projec
    :root (io/current-directory)
    :packages-path "packages"
    :source-paths ["src"]
