@@ -4,7 +4,7 @@
             [camp.io :as cio])
   (:import [System Environment]
            [System.IO File StreamReader]
-           [clojure.lang PushbackTextReader]))
+           [clojure.lang PushbackTextReader Reflector RT]))
 
 (def ^:dynamic *options*
   {:error? true
@@ -44,6 +44,18 @@
   (let [d (|System.Collections.Generic.Dictionary`2[System.String,System.String]|.)]
     (doseq [k (keys m)]
       (.Add d (str k) (str (m k))))))
+
+(defn into-dictionary [^Type key-type ^Type value-type m]
+  (let [full-name
+        (String/Format "System.Collections.Generic.Dictionary`2[{0},{1}]"
+                       (.FullName key-type)
+                       (.FullName value-type))
+        d (Reflector/InvokeConstructor
+               (RT/classForName full-name)
+               (make-array Object 0))]
+    (doseq [k (keys m)]
+      (.Add d k (map k)))
+    d))
 
 (defn resolve-task
   "Given the name of a task, find the function that implements it."
