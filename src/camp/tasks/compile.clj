@@ -95,7 +95,7 @@
       (io/mkdir targets-path))
 
     (p/with-assembly-resolution
-      proj
+      (nuget/libs proj)
       (compile-sources proj))
 
     (catch Exception ex

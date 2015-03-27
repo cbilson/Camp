@@ -4,7 +4,8 @@
             [clojure.pprint :as pp]
             [camp.core :refer [debug warn]]
             [camp.io :as io])
-  (:import [System.IO Path Directory]))
+  (:import [System.IO Path Directory]
+           [System.Reflection AssemblyName]))
 
 (declare unquote-project)
 
@@ -47,7 +48,7 @@
    :version "0.1.0-SNAPSHOT"
    :safe-name ""
    :target-framework "net45"
-   
+
    :nuget {
            ;; sources for nuget packages: :default, :v3, :v2-legacy-official,
            ;; :v2-legacy, :v1, :vs-express-for-windows-8,
@@ -125,34 +126,39 @@
       path
       (io/file root path))))
 
-(defn find-target
-  [{:keys [targets-path] :as proj} name]
-  (let [targets (resolve-relative-path proj targets-path)]
-    (->> [(io/file targets (str name ".dll"))]
-         (filter io/file-exists?)
-         first)))
-
 (defn resolve-assembly
-  [proj name]
-  (if-let [file (find-target proj name)]
-    (do
-      (debug "Resolved" file)
-      (System.Reflection.Assembly/LoadFrom file))
-    (warn "Failed to resolve" name)))
+  [assembly-map name]
+  (debug "Trying to resolve" name)
+  (let [asm-name (AssemblyName. name)
+        simple-name (.Name asm-name)]
+    (debug "simple name:" simple-name)
+    (if-let [file (assembly-map simple-name)]
+      (do
+        (debug "Resolved" file)
+        (System.Reflection.Assembly/LoadFrom file))
+      (warn "Failed to resolve" name))))
 
 (defn resolve-assembly-delegate
-  [proj]
-  (gen-delegate
-   ResolveEventHandler [_ event-args]
-   (resolve-assembly proj (.Name event-args))))
+  "Creates a delegate that will resolve assembly references from our nuget
+  packages."
+  [assemblies]
+  (let [get-key-val (juxt io/file-name-without-extension identity)
+        assembly-map (into {} (map get-key-val assemblies))]
+    (debug "Dependency assemblies:")
+    (with-open [writer (System.IO.StringWriter.)]
+      (clojure.pprint/pprint assembly-map writer)
+      (debug writer))
+
+    (gen-delegate
+     ResolveEventHandler [_ event-args]
+     (resolve-assembly assembly-map (.Name event-args)))))
 
 (defmacro with-assembly-resolution
   "Eval forms with the AppDomain setup to resolve assemblies from
   the targets folder."
-  [proj & forms]
-  `(let [resolver# (resolve-assembly-delegate ~proj)]
+  [assemblies & forms]
+  `(let [resolver# (resolve-assembly-delegate ~assemblies)]
      (.add_AssemblyResolve (AppDomain/CurrentDomain) resolver#)
-     (try
-       ~@forms
-       (finally
-         (.remove_AssemblyResolve (AppDomain/CurrentDomain) resolver#)))))
+     (try ~@forms
+          (finally
+            (.remove_AssemblyResolve (AppDomain/CurrentDomain) resolver#)))))
