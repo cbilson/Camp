@@ -1,60 +1,51 @@
 @inherits Westwind.RazorHosting.RazorTemplateBase
 (assembly-load "Owin")
+(assembly-load "Microsoft.Owin")
 (assembly-load "Microsoft.Owin.Diagnostics")
 (assembly-load "Microsoft.Owin.Hosting")
 
 (ns @string.Format("{0}.core", Model["name"])
-    (:import [Microsoft.Owin.Hosting StartOptions WebApp]
-             [Owin IAppBuilder WelcomePageExtensions])
-    (:gen-class))
+  (:import [System.Threading.Tasks Task]
+           [Owin IAppBuilder]
+           [Microsoft.Owin IOwinContext]
+           [Microsoft.Owin.Extensions UseHandlerMiddleware]
+           [Microsoft.Owin.Hosting StartOptions WebApp])
+  (:gen-class))
 
-(defn configure [^IAppBuilder app]
-  (WelcomePageExtensions/UseWelcomePage app))
+(defn ^Task handler [^IOwinContext context]
+  (let [resp (.Response context)]
+    (.StartNew Task/Factory
+               (fn []
+                 (.Write resp "<html><body>TODO: finish</body></html>")))))
 
-(defn start [& args]
-  (agent
-   (let [options (apply hash-map args)
-         port (or (:port options) 9000)
-         start-options (StartOptions. (str "http://localhost:" port "/"))]
+(defn configure [^IAppBuilder app-builder]
+  (.Use app-builder UseHandlerMiddleware #^objects
+        (into-array Object
+	[(sys-func [IOwinContext Task] [ctxt] (handler ctxt))])))
+
+(defn start
+  ([] (start 9000))
+  ([port]
+   (let [start-options (StartOptions. (str "http://localhost:" port "/"))]
      ;; HACK: Microsoft.Owin.Hosting.WebApp.StartImplementation always tries to
      ;; get startup.Method.ReflectedType.FullName, even if you give
      ;; it a startup function, because it uses that to determine the
      ;; app name, even if you give it one.
-     (set! (.AppStartup start-options) "my-webapp")
+     (set! (.AppStartup start-options) "@Model["name"]")
      (WebApp/Start start-options configure))))
 
 (defn stop [app]
   (.Dispose app))
 
-(def cmdline-switches {"--debug" :debug?})
-(def cmdline-switch-set (->> cmdline-switches keys hash-set))
-(def cmdline-options {"--port" :port})
-
 (defn -main [& args]
-  (let [switches (->> args (filter cmdline-switch-set) (map cmdline-switches))
-        options (->> args (remove cmdline-switche-set))
-        debug? (some #{"--debug"} switches)]
-    (try
-      (let [app (apply start args)]
-        (apply start args)
-        (println "Server running. Press [Enter] to stop.")
-        (read-line)
-        (send app stop)
-        0)
-      (catch Exception ex
-        (println "Error:" (.Message ex))
-        (when debug?
-          (binding [*out* *err*]
-            (println (.ToString ex))))
-        -1))))
-
-
-(defn -Configuration [_ ^IAppBuilder app]
-  (WelcomePageExtensions/UseWelcomePage app))
-
-(defn -main [& args]
-  (let [options (StartOptions. "http://localhost:9000/")]
-    (set! (.AppStartup options) "@coreAssemblyName")
-    (with-open [app (WebApp/Start options)]
+  (try
+    (let [app (start)]
       (println "Server running. Press [Enter] to stop.")
-      (read-line))))
+      (read-line)
+      (send app stop)
+      0)
+    (catch Exception ex
+      (println "Error:" (.Message ex))
+      (binding [*out* *err*]
+        (println (.ToString ex)))
+      -1)))
