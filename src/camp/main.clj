@@ -7,7 +7,7 @@
 (defn- arg?
   "Determine if an argument was supplied."
   [arg-set & names]
-  (some arg-set names))
+  (not (nil? (some arg-set names))))
 
 (def camp-options
   #{"--debug" "-vv" "--verbose" "-v" "--quiet" "-q"})
@@ -39,8 +39,6 @@
       (try
         (apply-task project args)
         (catch Exception e
-          (println (str "Error: "
-                        (if (:verbose? project)
-                          (.ToString e)
-                          (.Message e))))
+          (core/verbose "Exception:" (.ToString e))
+          (core/error "Error:" (.Message e))
           (Environment/Exit -1))))))
