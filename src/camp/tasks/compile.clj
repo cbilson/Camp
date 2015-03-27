@@ -9,19 +9,6 @@
             [camp.project :as p]
             [camp.tasks.deps :as deps]))
 
-(defn- copy-dep-libs
-  "Make sure libs from all of the project's dependencies are in the
-  targets directory."
-  [{:keys [targets-path] :as proj}]
-  (doseq [source-file-name (nuget/libs proj)]
-    (debug "lib:" source-file-name)
-    (let [file-name (io/file-name-only source-file-name)
-          destination-file-name (p/resolve-relative-path targets-path file-name)]
-      (when (or (not (io/file-exists? destination-file-name))
-                (io/newer? source-file-name destination-file-name))
-        (verbose "Copying" source-file-name "to" destination-file-name)
-        (io/copy source-file-name destination-file-name true)))))
-
 (defn- source-file->target-ns
   "To go from a source file path to a namespace, we need to remove
   the src part of the path, replace '_' with '-', and replace '/' with '.'."
@@ -106,7 +93,6 @@
     (when (not (io/directory-exists? targets-path))
       (verbose "Creating targets folder")
       (io/mkdir targets-path))
-    (copy-dep-libs proj)
 
     (p/with-assembly-resolution
       proj
