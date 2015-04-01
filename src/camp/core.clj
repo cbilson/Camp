@@ -69,9 +69,10 @@
       (resolve sym))
     (catch Exception e
       (error "Task" task-name "not found.")
-      (let [ns-sym (symbol "camp.tasks.help")]
+      (let [ns (str "camp.tasks.help")
+            ns-sym (symbol ns)]
         (require ns-sym)
-        (resolve (symbol ns-sym "help"))))))
+        (resolve (symbol ns "help"))))))
 
 (defn resource
   "Get a resource stream for some named resource in an assembly."
