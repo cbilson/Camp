@@ -7,7 +7,9 @@
       (str/replace name "/" ".")))
 
 (defn deploy
-  "Deploy a nupkg of the project to a nuget repository."
+  "Deploy a nupkg of the project to a nuget repository.
+
+  ***NOT IMPLEMENTED YET***"
   [{:keys [name version deploy-repository]} & args]
   (let [package-name (clojure-name->nuget-name name)]
     (println "TODO: make sure there is a nupkg in targets and nuget push that.")))

@@ -15,7 +15,26 @@
     (resolve sym)))
 
 (defn new
-  "Create a new ClojureCLR project from a template."
+  "Create a new ClojureCLR project from a template.
+
+  camp new <project-name>
+  -----------------------
+  Creates a new project with the specified name.
+
+  camp new <template> <project-name>
+  ----------------------------------
+  Creates a new project using the specified template.
+
+  Available Templates:
+  
+  <default>
+  Creates a project.clj, README, and core.clj.
+  
+  webapp
+  Creates a web application project, using OWIN, with all the
+  necessary dependencies, a project.clj, and a core.clj that
+  creates a basic self-hosted web application."
+  ;; TODO: Enumerate all the available templates
   [_  & [template name & rest]]
   (let [[template name] (if (nil? name) ["default" template] [template name])
         safe-name (.Replace name "-" "_")

@@ -84,8 +84,41 @@
               (error (.ToString ex))
               (throw ex))))))))
 
+(defn- create-config-file-if-newer [source target]
+  (if (and (io/file-exists? target)
+           (not (io/newer? source target)))
+    (debug target "not older than" source ". Not updating.")
+    (do
+      (verbose "Creating" target "from" source)
+      (io/copy source target))))
+
+(defn- create-exe-configs [targets-path]
+  (when (io/file-exists? "app.config")
+    (doseq [exe (io/files targets-path "*.exe")
+            :let [target (io/file targets-path (str exe ".config"))]]
+      (create-config-file-if-newer "app.config" target))))
+
+(defn- create-web-config [targets-path]
+  (when (io/file-exists? "app.config")
+    (io/file targets-path "web.config")))
+
 (defn compile
-  "Compile task, to compile the project into assemblies and exes."
+  "Compiles the project into assemblies and exes.
+
+  Any classes in the project for which the `:main' option is true (which
+  is the default) will be compiled into an executable assemblies. All
+  other clojure source files and classes will be compiled each into a
+  separate library assembly. All compilation targets will be in the
+  `targets' directory under the root of the project.
+
+  If any dependency is missing, it is fetched before compilation starts.
+
+  If there is an `app.config' file in the root directory of the project,
+  it is copied into `targets' directory once for each executable
+  target, renamed to `<target>.exe.config.'
+
+  If there is a `web.config' file in the root directory of the project,
+  it will be copied into `targets' as `web.config'."
   [{:keys [targets-path] :as proj} & _]
   (try
     (verbose "Checking deps" targets-path)
@@ -94,6 +127,10 @@
     (p/with-assembly-resolution
       (nuget/libs proj)
       (compile-sources proj))
+
+    (create-exe-configs targets-path)
+
+    (create-web-config targets-path)
 
     (catch Exception ex
       (error "Error:" (.Message ex))

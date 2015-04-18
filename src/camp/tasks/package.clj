@@ -3,7 +3,10 @@
   (:require [camp.nuget :as nuget]))
 
 (defn package
-  "The equivalent of `nuget pack'."
+  "Packages up project targets into a nuget package. The equivalent of
+  `nuget pack'.
+
+  ***NOT IMPLEMENTED YET***"
   [project & _]
   (println "TODO: Gather dlls, exes, and other content in targets/")
   (println "TODO: Generate manifest")

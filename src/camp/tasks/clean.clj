@@ -19,7 +19,11 @@
         (io/remove-file! path)))))
 
 (defn clean
-  "Clean up an generated artifacts in a project."
+  "Clean up an generated artifacts in a project.
+
+  options
+  -------
+  --scorch    Also remove downloaded dependencies."
   [project & options]
   (doseq [dir [(:targets-path project)]]
     (remove-if-exists project dir))
