@@ -25,9 +25,10 @@
   "Given a project and args, lookup the task (always the 1st argument)
   and apply it to the project and the rest of the arguments."
   [project args]
-  (let [task-name (or (first args) "help")
-        task (core/resolve-task task-name)]
-    (or (apply task project (rest args)) 0)))
+  (let [task-name (or (first args) "help")]
+    (if-let [task (core/resolve-task task-name)]
+      (or (apply task project (rest args)) 0)
+      -1)))
 
 (defn -main
   "Entry point for camp. Resolve first argument as camp.tasks.<name>/<name>,
