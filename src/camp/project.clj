@@ -69,6 +69,12 @@
 
    ;; root directory of the projec
    :root (io/current-directory)
+
+
+   ;; specifies where to find config files
+   :app-config "app.config"
+   :web-config nil
+   
    :packages-path "packages"
    :source-paths ["src"]
    :targets-path "targets"
@@ -81,7 +87,8 @@
                        (apply hash-map (unquote-project args))
                        {:name (str project-name)
                         :version version
-                        :root (io/directory *file*)})]
+                        :root (io/directory *file*)
+                        :app-config (io/file (io/directory *file*) "app.config")})]
      (def ~'project args#)))
 
 (defn eval-project [file-name]

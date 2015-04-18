@@ -90,17 +90,20 @@
     (debug target "not older than" source ". Not updating.")
     (do
       (verbose "Creating" target "from" source)
-      (io/copy source target))))
+      (io/copy source target true))))
 
-(defn- create-exe-configs [targets-path]
-  (when (io/file-exists? "app.config")
+(defn- create-exe-configs [{:keys [app-config targets-path]}]
+  (when (io/file-exists? app-config)
+    ;; HACK: maybe it would be better to use tools.something to find all the
+    ;;       gen-class's that have main, instead of doing this.
     (doseq [exe (io/files targets-path "*.exe")
-            :let [target (io/file targets-path (str exe ".config"))]]
-      (create-config-file-if-newer "app.config" target))))
+            :let [target (str exe ".config")]]
+      (create-config-file-if-newer app-config target))))
 
-(defn- create-web-config [targets-path]
-  (when (io/file-exists? "app.config")
-    (io/file targets-path "web.config")))
+(defn- create-web-config [{:keys [web-config targets-path]}]
+  (when (io/file-exists? web-config)
+    (create-config-file-if-newer web-config
+                                 (io/file targets-path "web.config"))))
 
 (defn compile
   "Compiles the project into assemblies and exes.
@@ -128,9 +131,9 @@
       (nuget/libs proj)
       (compile-sources proj))
 
-    (create-exe-configs targets-path)
+    (create-exe-configs proj)
 
-    (create-web-config targets-path)
+    (create-web-config proj)
 
     (catch Exception ex
       (error "Error:" (.Message ex))
