@@ -72,7 +72,7 @@
   </ItemGroup>
 
   <Target Name="RestorePackages">
-    <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir)&quot;" />
+    <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir.TrimEnd('\'))&quot;" />
   </Target>
 
   <Target Name="All" DependsOnTargets="Init;Compile;Package" />
