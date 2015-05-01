@@ -34,7 +34,7 @@
     <ClojurePackageDir>$(PackagesDir)Clojure.1.6.0.1\</ClojurePackageDir>
     <TargetsDir>targets\</TargetsDir>
     <TestProjectName>test-project</TestProjectName>
-    <ChocoExe>$(PackagesDir)chocolatey.0.9.9-rc8\tools\chocolateyInstall\choco.exe</ChocoExe>
+    <ChocoExe>$(PackagesDir)chocolatey.0.9.8.28\tools\chocolateyInstall\chocolatey.cmd</ChocoExe>
     <ClojureCompilePath>$([System.IO.Path]::GetFullPath($(TargetsDir)))</ClojureCompilePath>
   </PropertyGroup>
 
@@ -75,7 +75,7 @@
     <Exec Command="&quot;$(ToolsDir)NuGet.exe&quot; restore -PackagesDirectory &quot;$(PackagesDir.TrimEnd('\'))&quot;" />
   </Target>
 
-  <Target Name="All" DependsOnTargets="Init;Compile;Package" />
+  <Target Name="All" DependsOnTargets="Compile;Package" />
 
   <Target Name="Compile"
 	  DependsOnTargets="InitToolsDir;
@@ -177,7 +177,7 @@
     <Exec Command="$(ChocoExe) install --force --pre --source chocolatey camp.portable" />
   </Target>
 
-    <Target Name="UnInstall">
+  <Target Name="UnInstall">
     <Exec Command="$(ChocoExe) uninstall --allversions camp.portable" />
   </Target>
 

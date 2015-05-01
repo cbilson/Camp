@@ -27,6 +27,6 @@
     <releaseNotes>Initial release.</releaseNotes>
   </metadata>
   <files>
-    <file src="targets\**" target="chocolatey\tools" />
+    <file src="..\targets\**" target="chocolatey\tools" />
   </files>
 </package>
